@@ -16,6 +16,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public Vector3d Normal;
         public Plane Frame;
 
+        public Polyline PlatePolyline;
         public Curve PlateCurve;
 
         public DFAgent(Point3d startPosition, List<BehaviorBase> behaviors) : base(startPosition, behaviors)
@@ -88,7 +89,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// <returns>Returns a list containing each agent's position.</returns>
         public override List<object> GetDisplayGeometries()
         {
-            return new List<object> { Frame };
+            return new List<object> { Frame, PlatePolyline };
         }
 
         /// <summary>

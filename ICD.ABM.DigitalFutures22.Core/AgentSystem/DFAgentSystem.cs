@@ -58,7 +58,6 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
                 agents[i].AgentSystem = this;
                 this.Agents.Add((AgentBase)agents[i]);
             }
-
         }
 
         /// <inheritdoc />
@@ -72,14 +71,15 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         {
             if (ComputeVoronoiCells)
             {
-                Node2List nodes = new Node2List();
-                foreach (CartesianAgent agent in this.Agents)
-                    nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
-                diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
-                List<Node2> node2List = new List<Node2>();
-                foreach (Point3d boundaryCorner in this.CartesianEnvironment.BoundaryCorners)
-                    node2List.Add(new Node2(boundaryCorner.X, boundaryCorner.Y));
-                this.VoronoiCells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, (IEnumerable<Node2>)node2List);
+                //Node2List nodes = new Node2List();
+                //foreach (CartesianAgent agent in this.Agents)
+                //    nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
+                //diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
+                //List<Node2> node2List = new List<Node2>();
+                //foreach (Point3d boundaryCorner in this.CartesianEnvironment.BoundaryCorners)
+                //    node2List.Add(new Node2(boundaryCorner.X, boundaryCorner.Y));
+                //this.VoronoiCells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, (IEnumerable<Node2>)node2List);
+                ComputePlates();
             }
 
             if (ComputeDelaunayConnectivity)
@@ -150,20 +150,19 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             return cartesianAgentList;
         }
 
-        //public void ComputePlates(PlateAgentSystem plateAgentSystem)
-        //{
-        //    Polyline poly;
-        //    SingleBrepEnvironment thisEnvironment = plateAgentSystem.SurfEnvironment as SingleBrepEnvironment;
+        public void ComputePlates()
+        {
+            Polyline poly;
 
-        //    if (!thisEnvironment.BoundaryCurves2D()[0].TryGetPolyline(out poly))
-        //    {
-        //        throw new Exception("Failed to get the polyline");
-        //    }
-        //    outline = new Node2List(poly);
+            if (!SingleBrepEnvironment.BoundaryCurves2D()[0].TryGetPolyline(out poly))
+            {
+                throw new Exception("Failed to get the polyline");
+            }
+            outline = new Node2List(poly);
 
-        //    computeConnectivityMesh(plateAgentSystem);
-        //    computePlates(plateAgentSystem);
-        //}
+            computeConnectivityMesh();
+            computePlates();
+        }
 
         private void computeConnectivityMesh()
         {
@@ -193,17 +192,14 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             }
         }
 
-        //private void computePlates()
-        //{
+        private void computePlates()
+        {
+            List<Grasshopper.Kernel.Geometry.Voronoi.Cell2> cells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(new Node2List(uvs), diagram, outline);
 
-        //    List<AgentBase> plateAgents = plateAgentSystem.Agents;
-
-        //    List<Grasshopper.Kernel.Geometry.Voronoi.Cell2> cells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(new Node2List(uvs), diagram, outline);
-
-        //    for (int i = 0; i < cells.Count; i++)
-        //    {
-        //        //Agents.PlateCurves = cells[i].ToPolyline();
-        //    }
-        //}
+            for (int i = 0; i < cells.Count; i++)
+            {
+                (Agents[i] as DFAgent).PlatePolyline = cells[i].ToPolyline();
+            }
+        }
     }
 }
