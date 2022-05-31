@@ -38,9 +38,14 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         /// </summary>
         public bool ComputeDelaunayConnectivity = false;
 
-        public DFAgent manipulatedAgent = null;
-        public SingleBrepEnvironment SingleBrepEnvironment;
 
+        public SingleBrepEnvironment SingleBrepEnvironment;
+        public Mesh Mesh;
+
+        private List<Point3d> uvs;
+        private Node2List outline;
+
+        public DFAgent manipulatedAgent = null;
 
         public DFAgentSystem(List<DFAgent> agents) //, CartesianEnvironment cartesianEnvironment)
         {
@@ -79,10 +84,11 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
             if (ComputeDelaunayConnectivity)
             {
-                Node2List nodes = new Node2List();
-                foreach (DFAgent agent in this.Agents)
-                    nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
-                diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
+                //Node2List nodes = new Node2List();
+                //foreach (DFAgent agent in this.Agents)
+                //    nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
+                //diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(nodes, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
+                computeConnectivityMesh();
             }
 
             foreach (AgentBase agent in this.Agents)
@@ -100,6 +106,8 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
             foreach (DFAgent agent in Agents)
                 displayGeometry.AddRange(agent.GetDisplayGeometries());
+
+            displayGeometry.Add(Mesh);
 
             return displayGeometry;
         }
@@ -141,5 +149,61 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
             return cartesianAgentList;
         }
+
+        //public void ComputePlates(PlateAgentSystem plateAgentSystem)
+        //{
+        //    Polyline poly;
+        //    SingleBrepEnvironment thisEnvironment = plateAgentSystem.SurfEnvironment as SingleBrepEnvironment;
+
+        //    if (!thisEnvironment.BoundaryCurves2D()[0].TryGetPolyline(out poly))
+        //    {
+        //        throw new Exception("Failed to get the polyline");
+        //    }
+        //    outline = new Node2List(poly);
+
+        //    computeConnectivityMesh(plateAgentSystem);
+        //    computePlates(plateAgentSystem);
+        //}
+
+        private void computeConnectivityMesh()
+        {
+            uvs = new List<Point3d>();
+            Mesh = new Mesh();
+
+            foreach (DFAgent agent in Agents)
+            {
+
+                Point3d uvCoordinates = SingleBrepEnvironment.UVCoordinates(agent.Position);
+                uvs.Add(uvCoordinates);
+                Mesh.Vertices.Add(agent.Position);
+            }
+
+            List<Grasshopper.Kernel.Geometry.Delaunay.Face> faces =
+                Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Faces(
+                    new Node2List(uvs),
+                    Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+            diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(
+                new Node2List(uvs),
+                Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
+
+            foreach (var face in faces)
+            {
+                Mesh.Faces.AddFace(face.A, face.B, face.C);
+            }
+        }
+
+        //private void computePlates()
+        //{
+
+        //    List<AgentBase> plateAgents = plateAgentSystem.Agents;
+
+        //    List<Grasshopper.Kernel.Geometry.Voronoi.Cell2> cells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(new Node2List(uvs), diagram, outline);
+
+        //    for (int i = 0; i < cells.Count; i++)
+        //    {
+        //        //Agents.PlateCurves = cells[i].ToPolyline();
+        //    }
+        //}
     }
 }

@@ -16,6 +16,8 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public Vector3d Normal;
         public Plane Frame;
 
+        public Curve PlateCurve;
+
         public DFAgent(Point3d startPosition, List<BehaviorBase> behaviors) : base(startPosition, behaviors)
         {
             this.StartPosition = this.Position = startPosition;
