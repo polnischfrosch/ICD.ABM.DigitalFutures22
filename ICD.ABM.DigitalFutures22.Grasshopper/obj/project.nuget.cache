@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "HH7Vf/2Vi23JcbDT9Nzi0wR+Wtbe0J/oTAIUo2K8wEe/vYOJ7kJzebOzXwdxUSGa49Rz3Zv5Uj9y7ydLipFmhQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Fabian\\Desktop\\ICD\\projects\\RP12\\files\\VS\\ICD.ABM.DigitalFutures22\\ICD.ABM.DigitalFutures22.Grasshopper\\ICD.ABM.DigitalFutures22.Grasshopper.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Fabian\\.nuget\\packages\\grasshopper\\7.18.22124.3001\\grasshopper.7.18.22124.3001.nupkg.sha512",
+    "C:\\Users\\Fabian\\.nuget\\packages\\rhinocommon\\7.18.22124.3001\\rhinocommon.7.18.22124.3001.nupkg.sha512"
+  ],
+  "logs": []
+}

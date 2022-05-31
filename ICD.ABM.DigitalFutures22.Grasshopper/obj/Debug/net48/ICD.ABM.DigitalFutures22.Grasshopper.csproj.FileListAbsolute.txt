@@ -1,0 +1,15 @@
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.csproj.AssemblyReference.cache
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.AssemblyInfoInputs.cache
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.AssemblyInfo.cs
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.csproj.CoreCompileInputs.cache
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\bin\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.gha
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\bin\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.pdb
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\bin\Debug\net48\ICD.ABM.DigitalFutures22.Core.dll
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\bin\Debug\net48\ICD.AbmFramework.Core.dll
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\bin\Debug\net48\ICD.ABM.DigitalFutures22.Core.pdb
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\bin\Debug\net48\ICD.AbmFramework.Core.pdb
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\bin\Debug\net48\ICD.AbmFramework.Core.xml
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.csproj.CopyComplete
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.gha
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Grasshopper\obj\Debug\net48\ICD.ABM.DigitalFutures22.Grasshopper.pdb

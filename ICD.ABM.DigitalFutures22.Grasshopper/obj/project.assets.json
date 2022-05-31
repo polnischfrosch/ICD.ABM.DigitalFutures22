@@ -1,0 +1,154 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.8": {
+      "Grasshopper/7.18.22124.3001": {
+        "type": "package",
+        "dependencies": {
+          "RhinoCommon": "[7.18.22124.3001]"
+        },
+        "compile": {
+          "lib/net48/GH_IO.dll": {},
+          "lib/net48/Grasshopper.dll": {}
+        },
+        "runtime": {
+          "lib/net48/_._": {}
+        },
+        "build": {
+          "build/Grasshopper.targets": {}
+        }
+      },
+      "RhinoCommon/7.18.22124.3001": {
+        "type": "package",
+        "compile": {
+          "lib/net48/Eto.dll": {},
+          "lib/net48/Rhino.UI.dll": {},
+          "lib/net48/RhinoCommon.dll": {}
+        },
+        "runtime": {
+          "lib/net48/Eto.dll": {},
+          "lib/net48/Rhino.UI.dll": {},
+          "lib/net48/RhinoCommon.dll": {}
+        },
+        "build": {
+          "build/RhinoCommon.targets": {}
+        }
+      },
+      "ICD.ABM.DigitalFutures22.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.8",
+        "dependencies": {
+          "Grasshopper": "7.18.22124.3001"
+        },
+        "compile": {
+          "bin/placeholder/ICD.ABM.DigitalFutures22.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/ICD.ABM.DigitalFutures22.Core.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Grasshopper/7.18.22124.3001": {
+      "sha512": "0jdUB9qSxlMqoLT/2AOqkKtAc7wVHdWEb3EezPg4NcZFJwF4yeH0uDdr+r+6V/fhowT8MwLmhNjo+rLr5QAdKQ==",
+      "type": "package",
+      "path": "grasshopper/7.18.22124.3001",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/Grasshopper.targets",
+        "grasshopper.7.18.22124.3001.nupkg.sha512",
+        "grasshopper.nuspec",
+        "grasshopper.png",
+        "lib/net48/GH_IO.XML",
+        "lib/net48/GH_IO.dll",
+        "lib/net48/Grasshopper.dll",
+        "lib/net48/Grasshopper.xml"
+      ]
+    },
+    "RhinoCommon/7.18.22124.3001": {
+      "sha512": "XJSrwfV1JZv/I/InJIin4aD5pX2hO1l8XW7MxkdBSt85XM4aKxb76tE2gHOv8l3F6R2y398ewjKM9Q/L/en1qw==",
+      "type": "package",
+      "path": "rhinocommon/7.18.22124.3001",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Eto-LICENSE.txt",
+        "build/RhinoCommon.targets",
+        "lib/net48/Eto.dll",
+        "lib/net48/Eto.xml",
+        "lib/net48/Rhino.UI.dll",
+        "lib/net48/RhinoCommon.XML",
+        "lib/net48/RhinoCommon.dll",
+        "rhinocommon.7.18.22124.3001.nupkg.sha512",
+        "rhinocommon.nuspec",
+        "rhinocommon.png"
+      ]
+    },
+    "ICD.ABM.DigitalFutures22.Core/1.0.0": {
+      "type": "project",
+      "path": "../ICD.ABM.DigitalFutures22.Core/ICD.ABM.DigitalFutures22.Core.csproj",
+      "msbuildProject": "../ICD.ABM.DigitalFutures22.Core/ICD.ABM.DigitalFutures22.Core.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.8": [
+      "Grasshopper >= 7.18.22124.3001",
+      "ICD.ABM.DigitalFutures22.Core >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Fabian\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Fabian\\Desktop\\ICD\\projects\\RP12\\files\\VS\\ICD.ABM.DigitalFutures22\\ICD.ABM.DigitalFutures22.Grasshopper\\ICD.ABM.DigitalFutures22.Grasshopper.csproj",
+      "projectName": "ICD.ABM.DigitalFutures22.Grasshopper",
+      "projectPath": "C:\\Users\\Fabian\\Desktop\\ICD\\projects\\RP12\\files\\VS\\ICD.ABM.DigitalFutures22\\ICD.ABM.DigitalFutures22.Grasshopper\\ICD.ABM.DigitalFutures22.Grasshopper.csproj",
+      "packagesPath": "C:\\Users\\Fabian\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Fabian\\Desktop\\ICD\\projects\\RP12\\files\\VS\\ICD.ABM.DigitalFutures22\\ICD.ABM.DigitalFutures22.Grasshopper\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Fabian\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net48"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net48": {
+          "targetAlias": "net48",
+          "projectReferences": {
+            "C:\\Users\\Fabian\\Desktop\\ICD\\projects\\RP12\\files\\VS\\ICD.ABM.DigitalFutures22\\ICD.ABM.DigitalFutures22.Core\\ICD.ABM.DigitalFutures22.Core.csproj": {
+              "projectPath": "C:\\Users\\Fabian\\Desktop\\ICD\\projects\\RP12\\files\\VS\\ICD.ABM.DigitalFutures22\\ICD.ABM.DigitalFutures22.Core\\ICD.ABM.DigitalFutures22.Core.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net48": {
+        "targetAlias": "net48",
+        "dependencies": {
+          "Grasshopper": {
+            "include": "Compile, Build",
+            "target": "Package",
+            "version": "[7.18.22124.3001, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.300\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

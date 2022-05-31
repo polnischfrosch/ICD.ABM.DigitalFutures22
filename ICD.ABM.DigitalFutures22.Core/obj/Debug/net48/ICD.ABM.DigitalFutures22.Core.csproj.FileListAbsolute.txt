@@ -1,0 +1,13 @@
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.csproj.AssemblyReference.cache
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.AssemblyInfoInputs.cache
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.AssemblyInfo.cs
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.csproj.CoreCompileInputs.cache
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\bin\Debug\net48\ICD.ABM.DigitalFutures22.Core.dll
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\bin\Debug\net48\ICD.ABM.DigitalFutures22.Core.pdb
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\bin\Debug\net48\ICD.AbmFramework.Core.dll
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\bin\Debug\net48\ICD.AbmFramework.Core.pdb
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\bin\Debug\net48\ICD.AbmFramework.Core.xml
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.csproj.CopyComplete
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.dll
+C:\Users\Fabian\Desktop\ICD\projects\RP12\files\VS\ICD.ABM.DigitalFutures22\ICD.ABM.DigitalFutures22.Core\obj\Debug\net48\ICD.ABM.DigitalFutures22.Core.pdb
