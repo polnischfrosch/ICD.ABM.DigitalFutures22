@@ -153,8 +153,18 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         public void ComputePlates()
         {
             Polyline poly;
+            PolylineCurve polyCrv;
 
-            if (!SingleBrepEnvironment.BoundaryCurves2D()[0].TryGetPolyline(out poly))
+            List<Curve> crvs = SingleBrepEnvironment.BoundaryCurves2D();
+            Curve[] joinedCrvs = Curve.JoinCurves(crvs);
+
+            polyCrv = joinedCrvs[0].ToPolyline(Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance,
+                Rhino.RhinoDoc.ActiveDoc.ModelAngleToleranceRadians,
+                Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance,
+                100000);
+            polyCrv.TryGetPolyline(out poly);
+
+            if (!polyCrv.TryGetPolyline(out poly))
             {
                 throw new Exception("Failed to get the polyline");
             }
