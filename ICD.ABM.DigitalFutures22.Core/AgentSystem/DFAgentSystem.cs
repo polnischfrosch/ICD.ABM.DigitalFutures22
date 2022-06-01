@@ -5,13 +5,11 @@ using ICD.ABM.DigitalFutures22.Core.Agent;
 using ICD.AbmFramework.Core.Agent;
 using ICD.AbmFramework.Core.AgentSystem;
 using ICD.AbmFramework.Core.Environments;
-using Rhino;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using static ICD.ABM.DigitalFutures22.Core.Utilities.MeshUtil;
 
 namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 {
@@ -43,7 +41,11 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         public Mesh Mesh;
 
         private List<Point3d> uvs;
+        private Node2List nodes;
+
         private Node2List outline;
+
+        public List<Polyline> DualPolylines;
 
         public DFAgent manipulatedAgent = null;
 
@@ -177,23 +179,34 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         private void computeConnectivityMesh()
         {
             uvs = new List<Point3d>();
+            nodes = new Node2List();
             Mesh = new Mesh();
 
             foreach (DFAgent agent in Agents)
             {
-
                 Point3d uvCoordinates = SingleBrepEnvironment.UVCoordinates(agent.Position);
                 uvs.Add(uvCoordinates);
+                //uvs.Add(agent.Position);
+                nodes.Append(new Node2(agent.Position.X, agent.Position.Y));
                 Mesh.Vertices.Add(agent.Position);
             }
 
+            //List<Grasshopper.Kernel.Geometry.Delaunay.Face> faces =
+            //    Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Faces(
+            //        new Node2List(uvs),
+            //        Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+            //diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(
+            //    new Node2List(uvs),
+            //    Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
+
             List<Grasshopper.Kernel.Geometry.Delaunay.Face> faces =
                 Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Faces(
-                    new Node2List(uvs),
+                    nodes,
                     Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
 
             diagram = Grasshopper.Kernel.Geometry.Delaunay.Solver.Solve_Connectivity(
-                new Node2List(uvs),
+                nodes,
                 Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, false);
 
             foreach (var face in faces)
@@ -204,7 +217,9 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
         private void computePlates()
         {
-            List<Grasshopper.Kernel.Geometry.Voronoi.Cell2> cells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(new Node2List(uvs), diagram, outline);
+            List<Grasshopper.Kernel.Geometry.Voronoi.Cell2> cells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, outline);
+
+            DualPolylines = Dual(Mesh, 0, null, null);
 
             for (int i = 0; i < cells.Count; i++)
             {
