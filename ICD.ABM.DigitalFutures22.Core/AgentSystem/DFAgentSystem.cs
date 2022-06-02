@@ -13,7 +13,7 @@ using static ICD.ABM.DigitalFutures22.Core.Utilities.MeshUtil;
 
 namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 {
-    public class DFAgentSystem : AgentSystemBase
+    public partial class DFAgentSystem : AgentSystemBase
     {
         /// <summary>
         /// The list of Voronoi cells associated with each agent.
@@ -60,6 +60,10 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
                 agents[i].AgentSystem = this;
                 this.Agents.Add((AgentBase)agents[i]);
             }
+        }
+
+        public DFAgentSystem() : base()
+        {
         }
 
         /// <inheritdoc />

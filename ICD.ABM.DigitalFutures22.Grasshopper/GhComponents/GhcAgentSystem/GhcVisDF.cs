@@ -14,6 +14,8 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
 {
     public class GhcVisDF : GH_Component
     {
+        public DFAgentSystem system = new DFAgentSystem();
+
         public GhcVisDF()
           : base("GhcVisDF", "VisDF",
               "Visualize DF Agent System",
@@ -37,7 +39,6 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
 
         protected override void SolveInstance(IGH_DataAccess DA)
         {
-            DFAgentSystem system = null;
             bool iDisplayOnly = false;
 
             DA.GetData(0, ref system);
@@ -52,9 +53,9 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
                 foreach (DFAgent agent in system.Agents)
                 {
                     agentFrames.Add(agent.Frame);
-                    platePolylines = system.DualPolylines;
                 }
 
+                platePolylines = system.DualPolylines;
                 mesh = system.Mesh;
             }
 
@@ -63,17 +64,17 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             DA.SetData(2, mesh);
         }
 
-        //public override void DrawViewportMeshes(IGH_PreviewArgs args)
-        //{
-        //    base.DrawViewportMeshes(args);
-        //    system.DisplayMeshes(args.Display, system);
-        //}
+        public override void DrawViewportMeshes(IGH_PreviewArgs args)
+        {
+            base.DrawViewportMeshes(args);
+            system.DisplayMeshes(args.Display, system);
+        }
 
-        //public override void DrawViewportWires(IGH_PreviewArgs args)
-        //{
-        //    base.DrawViewportWires(args);
-        //    system.DisplayWires(args.Display, system);
-        //}
+        public override void DrawViewportWires(IGH_PreviewArgs args)
+        {
+            base.DrawViewportWires(args);
+            system.DisplayWires(args.Display, system);
+        }
 
         protected override System.Drawing.Bitmap Icon => null;
         public override GH_Exposure Exposure => GH_Exposure.quarternary;
