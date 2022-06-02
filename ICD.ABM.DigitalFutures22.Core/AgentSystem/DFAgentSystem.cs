@@ -2,13 +2,12 @@
 using Grasshopper.Kernel.Geometry.Delaunay;
 using Grasshopper.Kernel.Geometry.Voronoi;
 using ICD.ABM.DigitalFutures22.Core.Agent;
+using ICD.ABM.DigitalFutures22.Core.Environments;
 using ICD.AbmFramework.Core.Agent;
 using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Environments;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
-
 using static ICD.ABM.DigitalFutures22.Core.Utilities.MeshUtil;
 
 namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
@@ -26,7 +25,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         /// <summary>
         /// The field to access the Cartesian environment of this agent system.
         /// </summary>
-        public CartesianEnvironment CartesianEnvironment;
+        //public CartesianEnvironment CartesianEnvironment;
         /// <summary>
         /// Boolean toggle to determine if Voronoi diagram should be computed for this system.
         /// </summary>
@@ -46,6 +45,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         private Node2List outline;
 
         public List<Polyline> DualPolylines;
+        public List<Curve> PlateCurves;
 
         public DFAgent manipulatedAgent = null;
 
@@ -225,10 +225,29 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
             DualPolylines = Dual(Mesh, 0, null, null);
 
-            for (int i = 0; i < cells.Count; i++)
-            {
-                (Agents[i] as DFAgent).PlatePolyline = cells[i].ToPolyline();
-            }
+            //for (int i = 0; i < cells.Count; i++)
+            //{
+            //    (Agents[i] as DFAgent).PlatePolyline = cells[i].ToPolyline();
+            //}
+
+            // TO DO: too slow, maybe not feasible
+
+            //PlateCurves = new List<Curve>();
+            //foreach (Polyline p in system.DualPolylines)
+            //for (int j = 0; j < 1; j++)
+            //{
+            //    for (int i = 0; i < DualPolylines[j].Count - 1; i++)
+            //    {
+            //        Point3d a = SingleBrepEnvironment.UVCoordinates(DualPolylines[j][i]);
+            //        Point3d b = SingleBrepEnvironment.UVCoordinates(DualPolylines[j][i + 1]);
+
+            //        Point2d start = new Point2d(a.X, a.Y);
+            //        Point2d end = new Point2d(b.X, b.Y);
+
+            //        Curve sPath = SingleBrepEnvironment.BrepObject.Surfaces[0].ShortPath(start, end, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+            //        PlateCurves.Add(sPath);
+            //    }
+            //}
         }
     }
 }

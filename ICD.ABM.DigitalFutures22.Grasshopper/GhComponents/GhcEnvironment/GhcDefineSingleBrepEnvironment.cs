@@ -2,7 +2,7 @@
 using ICD.ABM.DigitalFutures22.Core.Agent;
 using ICD.ABM.DigitalFutures22.Core.AgentSystem;
 using ICD.ABM.DigitalFutures22.Core.Behavior;
-using ICD.AbmFramework.Core.Environments;
+using ICD.ABM.DigitalFutures22.Core.Environments;
 using ICD.AbmFramework.Core.Utilities;
 using Rhino.Geometry;
 using System;

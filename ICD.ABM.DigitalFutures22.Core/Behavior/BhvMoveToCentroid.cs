@@ -1,8 +1,8 @@
 ﻿using ICD.ABM.DigitalFutures22.Core.Agent;
 using ICD.ABM.DigitalFutures22.Core.AgentSystem;
+using ICD.ABM.DigitalFutures22.Core.Environments;
 using ICD.AbmFramework.Core.Agent;
 using ICD.AbmFramework.Core.Behavior;
-using ICD.AbmFramework.Core.Environments;
 using Rhino.Geometry;
 
 namespace ICD.ABM.DigitalFutures22.Core.Behavior

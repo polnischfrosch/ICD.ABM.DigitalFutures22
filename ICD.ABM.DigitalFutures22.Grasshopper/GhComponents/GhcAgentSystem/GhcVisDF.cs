@@ -1,12 +1,7 @@
 ﻿using Grasshopper.Kernel;
 using ICD.ABM.DigitalFutures22.Core.Agent;
 using ICD.ABM.DigitalFutures22.Core.AgentSystem;
-using ICD.ABM.DigitalFutures22.Core.Behavior;
-
-using ICD.AbmFramework.Core.Environments;
-using ICD.AbmFramework.Core.Utilities;
 using Rhino.Geometry;
-using Rhino.Geometry.Intersect;
 using System;
 using System.Collections.Generic;
 
@@ -64,11 +59,11 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             DA.SetData(2, mesh);
         }
 
-        public override void DrawViewportMeshes(IGH_PreviewArgs args)
-        {
-            base.DrawViewportMeshes(args);
-            system.DisplayMeshes(args.Display, system);
-        }
+        //public override void DrawViewportMeshes(IGH_PreviewArgs args)
+        //{
+        //    base.DrawViewportMeshes(args);
+        //    system.DisplayMeshes(args.Display, system);
+        //}
 
         public override void DrawViewportWires(IGH_PreviewArgs args)
         {

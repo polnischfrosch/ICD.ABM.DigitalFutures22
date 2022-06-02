@@ -1,4 +1,5 @@
-﻿
+﻿using ICD.ABM.DigitalFutures22.Core.Agent;
+using ICD.ABM.DigitalFutures22.Core.Environments;
 using ICD.AbmFramework.Core.AgentSystem;
 using Rhino.Display;
 using Rhino.Geometry;
@@ -19,9 +20,46 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         {
             Dpl = dpl;
 
-            foreach (Polyline p in system.DualPolylines)
+            foreach (DFAgent a in system.Agents)
             {
-                Dpl.DrawPolyline(p, Color.Crimson);
+                Dpl.DrawPoint(
+                    a.Position,
+                    PointStyle.RoundSimple,
+                    Color.Crimson,
+                    Color.Crimson,
+                    7f, 2f, 0f, 0f, true, true);
+            }
+
+            //foreach (Polyline p in system.DualPolylines)
+            //for (int j = 0; j < 5; j++)
+            //    //{
+            //    //Dpl.DrawPolyline(p, Color.DarkSeaGreen);
+
+            //    //double u1;
+            //    //double v1;
+            //    //double u2;
+            //    //double v2;
+
+            //    for (int i = 0; i < system.DualPolylines[j].Count - 1; i++)
+            //    {
+
+            //        Point3d a = system.SingleBrepEnvironment.UVCoordinates(system.DualPolylines[j][i]);
+            //        Point3d b = system.SingleBrepEnvironment.UVCoordinates(system.DualPolylines[j][i + 1]);
+
+            //        Point2d start = new Point2d(a.X, a.Y);
+            //        Point2d end = new Point2d(b.X, b.Y);
+
+            //        Curve sPath = system.SingleBrepEnvironment.BrepObject.Surfaces[0].ShortPath(start, end, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+            //        Dpl.DrawCurve(sPath, Color.DarkSeaGreen);
+
+
+            foreach (Polyline pl in system.DualPolylines)
+            {
+                for (int i = 0; i < pl.Count - 1; i++)
+                {
+                    Dpl.DrawLine(pl[i], pl[i + 1], Color.DarkSeaGreen);
+                }
             }
         }
     }
