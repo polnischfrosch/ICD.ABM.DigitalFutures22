@@ -89,7 +89,8 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// <returns>Returns a list containing each agent's position.</returns>
         public override List<object> GetDisplayGeometries()
         {
-            return new List<object> { Frame, PlatePolyline };
+            //return new List<object> { Frame, PlatePolyline };
+            return new List<object> { };
         }
 
         /// <summary>

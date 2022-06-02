@@ -106,10 +106,10 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         {
             List<object> displayGeometry = new List<object>();
 
-            foreach (DFAgent agent in Agents)
-                displayGeometry.AddRange(agent.GetDisplayGeometries());
+            //foreach (DFAgent agent in Agents)
+            //    displayGeometry.AddRange(agent.GetDisplayGeometries());
 
-            displayGeometry.Add(Mesh);
+            //displayGeometry.Add(Mesh);
 
             return displayGeometry;
         }
