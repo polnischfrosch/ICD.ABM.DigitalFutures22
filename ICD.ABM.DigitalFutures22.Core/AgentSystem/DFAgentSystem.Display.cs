@@ -22,12 +22,14 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
             foreach (DFAgent a in system.Agents)
             {
+                Dpl.DrawLine(a.Position, a.Position + 200 * a.Frame.XAxis, Color.SteelBlue, 3);
+
                 Dpl.DrawPoint(
                     a.Position,
                     PointStyle.RoundSimple,
                     Color.Crimson,
                     Color.Crimson,
-                    7f, 2f, 0f, 0f, true, true);
+                    5f, 1f, 0f, 0f, true, true);
             }
 
             //foreach (Polyline p in system.DualPolylines)
@@ -53,12 +55,14 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
             //        Dpl.DrawCurve(sPath, Color.DarkSeaGreen);
 
-
-            foreach (Polyline pl in system.DualPolylines)
+            if (system.DualPolylines != null)
             {
-                for (int i = 0; i < pl.Count - 1; i++)
+                foreach (Polyline pl in system.DualPolylines)
                 {
-                    Dpl.DrawLine(pl[i], pl[i + 1], Color.DarkSeaGreen);
+                    for (int i = 0; i < pl.Count - 1; i++)
+                    {
+                        Dpl.DrawLine(pl[i], pl[i + 1], Color.DarkSeaGreen);
+                    }
                 }
             }
         }
