@@ -14,7 +14,7 @@
   
   <ItemGroup>
     <Reference Include="ICD.AbmFramework.Core">
-      <HintPath>..\..\AbmFramework_VS\bin\ICD.AbmFramework.Core.dll</HintPath>
+      <HintPath>..\..\builds\ICD.AbmFramework_v1.2.0\ICD.AbmFramework.Core.dll</HintPath>
     </Reference>
     <Reference Include="RhinoCommon">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Rhino 7\System\RhinoCommon.dll</HintPath>
