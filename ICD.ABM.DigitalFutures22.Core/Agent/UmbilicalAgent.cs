@@ -1,101 +1,91 @@
-﻿using ICD.ABM.DigitalFutures22.Core.AgentSystem;
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Behavior;
-using Rhino.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Rhino.Geometry;
+
+using ICD.AbmFramework.Core.Behavior;
+using ICD.AbmFramework.Core.Agent;
+
+using ICD.ABM.DigitalFutures22.Core.AgentSystem;
+
 namespace ICD.ABM.DigitalFutures22.Core.Agent
 {
-    public class UmbilicalAgent : CartesianAgent
+    public class UmbilicalAgent : AgentBase
     {
-        public Vector3d Normal;
-        public Plane Frame;
+        public Point2d UV = Point2d.Unset;
+        private Point2d startUV;
+        public Polyline Trail = new Polyline();
+        
+        /// <summary>
+        /// The list of 2-dimensional moves
+        /// </summary>
+        public List<Vector2d> Moves = new List<Vector2d>();
+        public List<double> Weights = new List<double>();
 
-        public Polyline PlatePolyline;
-        public Curve PlateCurve;
-
-        public UmbilicalAgent(Point3d startPosition, List<BehaviorBase> behaviors) : base(startPosition, behaviors)
+        public UmbilicalAgent(Point2d uvParameter, List<BehaviorBase> behaviors)
         {
-            this.StartPosition = this.Position = startPosition;
+            this.UV = this.startUV = uvParameter;
             this.Behaviors = behaviors;
         }
 
-        /// <summary>
-        /// Method for resetting the agent.
-        /// </summary>
         public override void Reset()
         {
-            this.Position = this.StartPosition;
-            Moves.Clear();
-            Weights.Clear();
+            this.Moves.Clear();
+            this.UV = this.startUV;
+            this.Trail.Clear();
         }
 
-        /// <summary>
-        /// Method for running code that should be pre-executed.
-        /// </summary>
         public override void PreExecute()
         {
-            Moves.Clear();
-            Weights.Clear();
-
-            UmbilicalAgentSystem thisAgentSystem = this.AgentSystem as UmbilicalAgentSystem;
-
-            // get Normal
-            Vector3d normalFromEnvironment = thisAgentSystem.SingleBrepEnvironment.GetNormal(Position);
-            if (normalFromEnvironment != Vector3d.Unset) Normal = normalFromEnvironment;
-
-            //get Frame
-
-            this.Frame = new Plane(this.Position, this.Normal);
+            this.Moves.Clear();
         }
 
-        /// <summary>
-        /// Method for updating the agent's state.
-        /// </summary>
         public override void Execute()
         {
             foreach (BehaviorBase behavior in this.Behaviors)
                 behavior.Execute(this);
         }
 
-        /// <summary>
-        /// Method for running code that should be post-executed.
-        /// </summary>
         public override void PostExecute()
         {
-            if (Moves.Count == 0) return;
-
-            Vector3d totalWeightedMove = Vector3d.Zero;
-            double totalWeight = 0.0;
-
-            for (int i = 0; i < Moves.Count; ++i)
+            if (this.Moves.Count > 0)
             {
-                totalWeightedMove += Weights[i] * Moves[i];
-                totalWeight += Weights[i];
+                Vector2d totalWeightedMove = Vector2d.Zero;
+                double totalWeight = 0.0;
+
+                for (int i = 0; i < Moves.Count; ++i)
+                {
+                    totalWeightedMove += Weights[i] * Moves[i];
+                    totalWeight += Weights[i];
+                }
+                this.UV += totalWeightedMove / totalWeight;
             }
 
-            if (totalWeight > 0.0)
-                Position += totalWeightedMove / totalWeight;
+            this.Trail.Add((this.AgentSystem as UmbilicalAgentSystem).SystemSurface.PointAt(UV.X, UV.Y));
+            if (Trail.Count > 20)
+                Trail.RemoveAt(0);
         }
 
-        /// <summary>
-        /// Method for collecting the geometry that should be displayed.
-        /// </summary>
-        /// <returns>Returns a list containing each agent's position.</returns>
         public override List<object> GetDisplayGeometries()
         {
-            //return new List<object> { Frame, PlatePolyline };
-            return new List<object> { };
+            List<object> displayGeometry = new List<object>();
+
+            //if ((this.AgentSystem as UVAgentSystem).SystemSurface == null)
+            //    return displayGeometry;
+
+            displayGeometry.Add((this.AgentSystem as UmbilicalAgentSystem).SystemSurface.PointAt(UV.X, UV.Y));
+
+            if ((this.Trail.Count < 2))
+                return displayGeometry;
+
+            displayGeometry.Add(this.Trail);
+
+            return displayGeometry;
         }
 
-        /// <summary>
-        /// The ID of the agent, unique within the given system
-        /// </summary>
-        public new int Id { get; internal set; }
+
     }
 }
