@@ -18,6 +18,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public Point2d UV = Point2d.Unset;
         private Point2d startUV;
         public Polyline Trail = new Polyline();
+        public bool isFinished = false;
         
         /// <summary>
         /// The list of 2-dimensional moves
@@ -36,6 +37,8 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
             this.Moves.Clear();
             this.UV = this.startUV;
             this.Trail.Clear();
+            this.isFinished = false;
+
         }
 
         public override void PreExecute()
@@ -45,6 +48,9 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 
         public override void Execute()
         {
+            if(this.isFinished)
+                return;
+
             foreach (BehaviorBase behavior in this.Behaviors)
                 behavior.Execute(this);
         }
