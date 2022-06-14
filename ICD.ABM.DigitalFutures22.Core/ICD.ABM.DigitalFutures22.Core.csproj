@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Reference Include="ICD.AbmFramework.Core">
-      <HintPath>..\..\..\..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
+      <HintPath>$(AppData)\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
