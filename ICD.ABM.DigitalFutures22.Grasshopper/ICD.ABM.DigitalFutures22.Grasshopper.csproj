@@ -23,10 +23,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="GhComponents\GhcAgent\" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\ICD.ABM.DigitalFutures22.Core\ICD.ABM.DigitalFutures22.Core.csproj" />
   </ItemGroup>
   
