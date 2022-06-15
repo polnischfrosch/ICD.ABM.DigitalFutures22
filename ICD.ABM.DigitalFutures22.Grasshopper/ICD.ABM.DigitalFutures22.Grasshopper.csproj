@@ -1,28 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net45</TargetFramework>
     <Version>1.0</Version>
     <Title>ICD.ABM.DigitalFutures22.Grasshopper</Title>
     <Description>Description of ICD.ABM.DigitalFutures22.Grasshopper</Description>
     <TargetExt>.gha</TargetExt>
+    <BaseOutputPath>bin\</BaseOutputPath>
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Grasshopper" Version="7.18.22124.3001" IncludeAssets="compile;build" />
+    <PackageReference Include="Grasshopper" Version="6.35.21222.17001" IncludeAssets="compile;build" />
   </ItemGroup>
   
   <ItemGroup>
     <Reference Include="ICD.AbmFramework.Core">
-      <HintPath>..\..\AbmFramework_VS\bin\ICD.AbmFramework.Core.dll</HintPath>
+      <HintPath>$(AppData)\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
     </Reference>
     <Reference Include="RhinoCommon">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Rhino 7\System\RhinoCommon.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="GhComponents\GhcAgent\" />
   </ItemGroup>
   
   <ItemGroup>
@@ -36,7 +33,7 @@
   </PropertyGroup>
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="Copy &quot;$(TargetPath)&quot; &quot;$(AppData)\Grasshopper\Libraries\ICD.ABM.DigitalFutures22\$(ProjectName).gha&quot;" />
+    <Exec Command="Copy &quot;$(TargetPath)&quot; &quot;$(AppData)\Grasshopper\Libraries\$(ProjectName).gha&quot;" />
   </Target>
 
 </Project>
