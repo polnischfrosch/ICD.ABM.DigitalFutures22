@@ -13,6 +13,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public Point2d startUV;
         public Polyline Trail = new Polyline();
         public Polyline Cell = new Polyline();
+        public List<PanelAgent> NeighborsOnRail = new List<PanelAgent>();
         public bool isFinished = false;
 
         /// <summary>

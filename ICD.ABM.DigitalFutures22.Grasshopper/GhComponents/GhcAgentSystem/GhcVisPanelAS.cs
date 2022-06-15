@@ -30,6 +30,7 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             pManager.AddPlaneParameter("Agent Frames", "P", "The agent frames", GH_ParamAccess.list);
             pManager.AddCurveParameter("CellPolylines", "C", "The agent cell polylines", GH_ParamAccess.list);
             pManager.AddMeshParameter("Mesh", "M", "The agent mesh", GH_ParamAccess.item);
+            pManager.AddCurveParameter("Neighbors on Rail", "N", "The agent Neighbors on rail", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -43,6 +44,7 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             List<Point3d> agentPositions = new List<Point3d>();
             List<Polyline> cellPolylines = new List<Polyline>();
             Mesh mesh = null;
+            List<LineCurve> neighborsOnRail = new List<LineCurve>();
 
             if (!iDisplayOnly)
             {
@@ -51,6 +53,12 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
                     //agentFrames.Add(agent.Frame);
                     agentPositions.Add(agent.Position);
                     cellPolylines.Add(agent.Cell);
+
+                    foreach (PanelAgent otherAgent in agent.NeighborsOnRail)
+                    {
+                        neighborsOnRail.Add(new LineCurve(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(agent.UV.X, agent.UV.Y),
+                                                          system.RailEnvironment.BrepObject.Surfaces[0].PointAt(otherAgent.UV.X, otherAgent.UV.Y)));
+                    }
                 }
 
                 mesh = system.SystemMesh;
@@ -60,6 +68,7 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             DA.SetDataList(0, agentPositions);
             DA.SetDataList(1, cellPolylines);
             DA.SetData(2, mesh);
+            DA.SetDataList(3, neighborsOnRail);
         }
 
         //public override void DrawViewportMeshes(IGH_PreviewArgs args)
