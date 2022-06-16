@@ -4,6 +4,7 @@ using ICD.ABM.DigitalFutures22.Core.AgentSystem;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
 {
@@ -31,6 +32,8 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             pManager.AddCurveParameter("CellPolylines", "C", "The agent cell polylines", GH_ParamAccess.list);
             pManager.AddMeshParameter("Mesh", "M", "The agent mesh", GH_ParamAccess.item);
             pManager.AddCurveParameter("Neighbors on Rail", "N", "The agent Neighbors on rail", GH_ParamAccess.list);
+            pManager.AddLineParameter("Panel Cuts", "PC", "The panel cuts on rail", GH_ParamAccess.list);
+            pManager.AddPointParameter("Intersections", "ITX", "The intersections with rail", GH_ParamAccess.list);
         }
 
         protected override void SolveInstance(IGH_DataAccess DA)
@@ -45,6 +48,8 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             List<Polyline> cellPolylines = new List<Polyline>();
             Mesh mesh = null;
             List<LineCurve> neighborsOnRail = new List<LineCurve>();
+            List<Line> panelCuts = new List<Line>();
+            List<Point3d> itx = new List<Point3d>();
 
             if (!iDisplayOnly)
             {
@@ -54,11 +59,61 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
                     agentPositions.Add(agent.Position);
                     cellPolylines.Add(agent.Cell);
 
+                    List<double> distances = new List<double>();
+
+                    // TO DO: getting only closest results in not always picking all connections, find other solution
                     foreach (PanelAgent otherAgent in agent.NeighborsOnRail)
                     {
-                        neighborsOnRail.Add(new LineCurve(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(agent.UV.X, agent.UV.Y),
-                                                          system.RailEnvironment.BrepObject.Surfaces[0].PointAt(otherAgent.UV.X, otherAgent.UV.Y)));
+                        distances.Add(agent.Position.DistanceTo(otherAgent.Position));
                     }
+
+                    double minVal = distances.Min();
+                    int index = distances.IndexOf(minVal);
+
+                    LineCurve ln = new LineCurve(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                              agent.UV.X, agent.UV.Y),
+                                                 system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                              agent.NeighborsOnRail[index].UV.X,
+                                                              agent.NeighborsOnRail[index].UV.Y));
+
+                    neighborsOnRail.Add(ln);
+
+                    Point3d mid = ln.PointAtNormalizedLength(0.5);
+
+                    Vector3d vec = ln.PointAtStart - ln.PointAtEnd;
+
+                    Vector3d dir = Vector3d.CrossProduct(vec, system.RailEnvironment.BrepObject.Surfaces[0].NormalAt(
+                        system.RailEnvironment.UVCoordinates(mid).X,
+                        system.RailEnvironment.UVCoordinates(mid).Y));
+
+                    //Vector3d dir = Vector3d.CrossProduct(vec, Vector3d.ZAxis);
+
+                    Line l = new Line(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                              system.RailEnvironment.UVCoordinates(mid).X,
+                                                              system.RailEnvironment.UVCoordinates(mid).Y), dir, 200);
+                    Line l2 = new Line(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                              system.RailEnvironment.UVCoordinates(mid).X,
+                                                              system.RailEnvironment.UVCoordinates(mid).Y), -dir, 200);
+
+                    //Line l2D = new Line(system.RailEnvironment.UVCoordinates(mid), dir, 100000);
+
+                    // find intersections with boundary and rails
+                    // CurveLine too heavy, too many CPs? crashes - try LineLine for now
+
+                    //foreach (Curve rail in system.RailEnvironment.Rails)
+                    //{
+                    //    Curve crv = system.RailEnvironment.BrepObject.Surfaces[0].Pullback(rail, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+                    //    var events = Rhino.Geometry.Intersect.Intersection.CurveLine(crv, l2D, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+                    //    foreach (var e in events)
+                    //    {
+                    //        itx.Add(e.PointA);
+                    //    }
+                    //}
+
+                    panelCuts.Add(l);
+                    panelCuts.Add(l2);
                 }
 
                 mesh = system.SystemMesh;
@@ -69,6 +124,8 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
             DA.SetDataList(1, cellPolylines);
             DA.SetData(2, mesh);
             DA.SetDataList(3, neighborsOnRail);
+            DA.SetDataList(4, panelCuts);
+            DA.SetDataList(5, itx);
         }
 
         //public override void DrawViewportMeshes(IGH_PreviewArgs args)
