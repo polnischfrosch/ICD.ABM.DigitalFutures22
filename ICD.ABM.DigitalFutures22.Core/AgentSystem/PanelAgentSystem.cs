@@ -220,9 +220,10 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
                 {
                     LineCurve ln = new LineCurve(agent.UV, otherAgent.UV);
 
-                    foreach (Curve rail in RailEnvironment.Rails)
+                    // TO DO: get railcurves from rail brep to avoid having both inputs
+                    foreach (Curve railC in RailEnvironment.RailCurves)
                     {
-                        Curve crv = RailEnvironment.BrepObject.Surfaces[0].Pullback(rail, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+                        Curve crv = RailEnvironment.BrepObject.Surfaces[0].Pullback(railC, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
 
                         var events = Rhino.Geometry.Intersect.Intersection.CurveCurve(crv, ln, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
 
