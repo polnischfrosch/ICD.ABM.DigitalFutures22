@@ -10,15 +10,17 @@ namespace ICD.ABM.DigitalFutures22.Core.Environments
 {
     public class RailEnvironment : SingleBrepEnvironment
     {
-        public List<Curve> Rails;
+        public List<Curve> RailCurves;
+        public List<Brep> Rails;
 
-        public RailEnvironment(Brep brep, List<Curve> rails)
+        public RailEnvironment(Brep brep, List<Curve> railCurves, List<Brep> rails)
         {
             BrepObject = brep;
+            RailCurves = railCurves;
             Rails = rails;
         }
 
-        public RailEnvironment(Brep brep, List<Curve> rails, double spacing)
+        public RailEnvironment(Brep brep, List<Brep> rails, double spacing)
         {
             BrepObject = brep;
             Rails = rails;

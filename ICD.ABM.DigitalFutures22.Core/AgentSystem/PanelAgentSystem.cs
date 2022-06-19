@@ -61,7 +61,8 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         {
             //base.PreExecute();
             this.SystemMesh = computeConnectivityMesh();
-            ComputePlates();
+            ComputeCells();
+            FindNeighborsOnRail();
         }
 
         public override void Execute()
@@ -165,7 +166,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             return SystemMesh;
         }
 
-        private void computeCells()
+        private void computeVoronoi()
         {
             List<Grasshopper.Kernel.Geometry.Voronoi.Cell2> cells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, outline);
 
@@ -183,7 +184,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             }
         }
 
-        public void ComputePlates()
+        public void ComputeCells()
         {
             Polyline poly;
             PolylineCurve polyCrv;
@@ -204,7 +205,36 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             outline = new Node2List(poly);
 
             computeConnectivityMesh();
-            computeCells();
+            computeVoronoi();
+        }
+
+        public void FindNeighborsOnRail()
+        {
+            foreach (PanelAgent agent in Agents)
+            {
+                List<PanelAgent> topoNeighbors = FindTopologicalNeighbors(agent);
+
+                List<PanelAgent> neighborsOnRail = new List<PanelAgent>();
+
+                foreach (PanelAgent otherAgent in topoNeighbors)
+                {
+                    LineCurve ln = new LineCurve(agent.UV, otherAgent.UV);
+
+                    // TO DO: get railcurves from rail brep to avoid having both inputs
+                    foreach (Curve railC in RailEnvironment.RailCurves)
+                    {
+                        Curve crv = RailEnvironment.BrepObject.Surfaces[0].Pullback(railC, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+                        var events = Rhino.Geometry.Intersect.Intersection.CurveCurve(crv, ln, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+                        if (events.Count < 1)
+                        {
+                            neighborsOnRail.Add(otherAgent);
+                        }
+                    }
+                }
+                agent.NeighborsOnRail = neighborsOnRail;
+            }
         }
 
         ///// <summary>
