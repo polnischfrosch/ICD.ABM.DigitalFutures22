@@ -20,7 +20,8 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcEnvironment
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.AddBrepParameter("Single Brep", "S", "Single Brep", GH_ParamAccess.item);
-            pManager.AddCurveParameter("Rails", "R", "Rail Curves", GH_ParamAccess.list);
+            pManager.AddCurveParameter("Rail Curves", "RC", "Rail Curves", GH_ParamAccess.list);
+            pManager.AddBrepParameter("Rail Surfaces", "RS", "Rail Surfaces", GH_ParamAccess.list);
             pManager.AddNumberParameter("Spacing", "S", "The double defining the curvature field's spacing", GH_ParamAccess.item);
             pManager[2].Optional = true;
         }
@@ -35,13 +36,16 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcEnvironment
             Brep iBrep = null;
             DA.GetData(0, ref iBrep);
 
-            List<Curve> iRails = new List<Curve>();
-            DA.GetDataList(1, iRails);
+            List<Curve> iRailCurves = new List<Curve>();
+            DA.GetDataList(1, iRailCurves);
+
+            List<Brep> iRailSurfaces = new List<Brep>();
+            DA.GetDataList(2, iRailSurfaces);
 
             double iSpacing = double.NaN;
-            DA.GetData(2, ref iSpacing);
+            DA.GetData(3, ref iSpacing);
 
-            railEnv = new RailEnvironment(iBrep, iRails);
+            railEnv = new RailEnvironment(iBrep, iRailCurves, iRailSurfaces);
 
             DA.SetData(0, railEnv);
         }
