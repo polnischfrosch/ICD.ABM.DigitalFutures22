@@ -82,6 +82,17 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
                 Trail.RemoveAt(0);
 
             this.Position = (this.AgentSystem as PanelAgentSystem).RailEnvironment.BrepObject.Surfaces[0].PointAt(UV.X, UV.Y);
+
+            // constrain agent to stay on brep
+            Point3d cloPt = (this.AgentSystem as PanelAgentSystem).RailEnvironment.BrepObject.ClosestPoint(this.Position);
+
+            if (this.Position.DistanceTo(cloPt) > Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
+            {
+                this.Position = (this.AgentSystem as PanelAgentSystem).RailEnvironment.BrepObject.ClosestPoint(this.Position);
+
+                Point3d UV = (this.AgentSystem as PanelAgentSystem).RailEnvironment.UVCoordinates(this.Position);
+                this.UV = new Point2d(UV.X, UV.Y);
+            }
         }
 
         public override List<object> GetDisplayGeometries()
