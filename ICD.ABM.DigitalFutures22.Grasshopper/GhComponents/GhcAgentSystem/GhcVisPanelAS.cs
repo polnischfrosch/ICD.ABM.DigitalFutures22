@@ -105,17 +105,6 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
 
                     //Line l2D = new Line(system.RailEnvironment.UVCoordinates(mid), dir, 100000);
 
-                    // find the rail on which the agent belongs is currently
-                    foreach (Brep rail in system.RailEnvironment.Rails)
-                    {
-                        Point3d cloPt = rail.ClosestPoint(agent.Position);
-
-                        if (agent.Position.DistanceTo(cloPt) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
-                        {
-                            agent.Rail = rail;
-                        }
-                    }
-
                     //plane intersection
                     Curve[] itxCrv = null;
                     Point3d[] itxPts = null;

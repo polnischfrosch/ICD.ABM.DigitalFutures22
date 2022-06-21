@@ -62,7 +62,6 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             //base.PreExecute();
             this.SystemMesh = computeConnectivityMesh();
             ComputeCells();
-            FindNeighborsOnRail();
         }
 
         public override void Execute()
@@ -101,25 +100,6 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             {
                 if (agent != otherAgent && agent.UV.DistanceTo(otherAgent.UV) < distance)
                     panelAgentList.Add(otherAgent);
-            }
-
-            return panelAgentList;
-        }
-
-        /// <summary>
-        /// Find all agents that are topologically connected to a given agent
-        /// </summary>
-        /// <param name="agent">The agent to search from.</param>
-        /// <returns>Returns the list of topologically connected neighboring agents.</returns>
-        public List<PanelAgent> FindTopologicalNeighbors(PanelAgent agent)
-        {
-            List<PanelAgent> panelAgentList = new List<PanelAgent>();
-
-            List<int> connections = diagram.GetConnections(agent.Id);
-
-            foreach (int index in connections)
-            {
-                panelAgentList.Add((PanelAgent)(this.Agents[index]));
             }
 
             return panelAgentList;
@@ -208,34 +188,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             computeVoronoi();
         }
 
-        public void FindNeighborsOnRail()
-        {
-            foreach (PanelAgent agent in Agents)
-            {
-                List<PanelAgent> topoNeighbors = FindTopologicalNeighbors(agent);
 
-                List<PanelAgent> neighborsOnRail = new List<PanelAgent>();
-
-                foreach (PanelAgent otherAgent in topoNeighbors)
-                {
-                    LineCurve ln = new LineCurve(agent.UV, otherAgent.UV);
-
-                    // TO DO: get railcurves from rail brep to avoid having both inputs
-                    foreach (Curve railC in RailEnvironment.RailCurves)
-                    {
-                        Curve crv = RailEnvironment.BrepObject.Surfaces[0].Pullback(railC, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
-
-                        var events = Rhino.Geometry.Intersect.Intersection.CurveCurve(crv, ln, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
-
-                        if (events.Count < 1)
-                        {
-                            neighborsOnRail.Add(otherAgent);
-                        }
-                    }
-                }
-                agent.NeighborsOnRail = neighborsOnRail;
-            }
-        }
 
         ///// <summary>
         ///// Computes the Delaunay mesh that correponds to the agent positions.

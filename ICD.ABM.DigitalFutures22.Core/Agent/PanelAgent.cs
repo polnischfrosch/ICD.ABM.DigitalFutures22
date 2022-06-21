@@ -38,11 +38,19 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
             this.Trail.Clear();
             this.isFinished = false;
             this.Rail = null;
+
+            FindRail();
+            FindNeighborsOnRail();
         }
 
         public override void PreExecute()
         {
             this.Moves.Clear();
+
+            //this.Position = (this.AgentSystem as PanelAgentSystem).RailEnvironment.BrepObject.Surfaces[0].PointAt(this.UV.X, this.UV.Y);
+
+            FindRail();
+            FindNeighborsOnRail();
         }
 
         public override void Execute()
@@ -92,6 +100,56 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
             displayGeometry.Add(this.Cell);
 
             return displayGeometry;
+        }
+
+        /// <summary>
+        /// Find all agents that are topologically connected to a given agent
+        /// </summary>
+        /// <param name="agent">The agent to search from.</param>
+        /// <returns>Returns the list of topologically connected neighboring agents.</returns>
+        public List<PanelAgent> FindTopologicalNeighbors()
+        {
+            List<PanelAgent> panelAgentList = new List<PanelAgent>();
+
+            List<int> connections = (this.AgentSystem as PanelAgentSystem).diagram.GetConnections(this.Id);
+
+            foreach (int index in connections)
+            {
+                panelAgentList.Add((PanelAgent)((this.AgentSystem as PanelAgentSystem).Agents[index]));
+            }
+
+            return panelAgentList;
+        }
+
+        public void FindRail()
+        {
+            foreach (Brep rail in (this.AgentSystem as PanelAgentSystem).RailEnvironment.Rails)
+            {
+                Point3d cloPt = rail.ClosestPoint(this.Position);
+
+                if (this.Position.DistanceTo(cloPt) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
+                {
+                    this.Rail = rail;
+                }
+            }
+        }
+
+        public void FindNeighborsOnRail()
+        {
+            List<PanelAgent> topoNeighbors = FindTopologicalNeighbors();
+
+            List<PanelAgent> neighborsOnRail = new List<PanelAgent>();
+
+            foreach (PanelAgent otherAgent in topoNeighbors)
+            {
+                Point3d cloPt = this.Rail.ClosestPoint(otherAgent.Position);
+
+                if (otherAgent.Position.DistanceTo(cloPt) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
+                {
+                    neighborsOnRail.Add(otherAgent);
+                }
+            }
+            this.NeighborsOnRail = neighborsOnRail;
         }
     }
 }
