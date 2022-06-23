@@ -1,27 +1,43 @@
-﻿using ICD.ABM.DigitalFutures22.Core.AgentSystem;
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Behavior;
-using Rhino.Geometry;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Rhino.Geometry;
+
+using ICD.AbmFramework.Core.Agent;
+using ICD.AbmFramework.Core.AgentSystem;
+using ICD.AbmFramework.Core.Behavior;
+
+using ICD.ABM.DigitalFutures22.Core.AgentSystem;
+
 namespace ICD.ABM.DigitalFutures22.Core.Agent
 {
     public class RailsAgent : AgentBase
     {
-        public Vector3d Normal;
-        public Plane Frame;
+        public double LocationParameter = -1.0;
+        public double StartLocation = -1.0;
+        
+        // Maybe I don't need either a normal (because it is the nromal at my UV)
+        //public Vector3d Normal;
+        // Maybe I don't need a Frame either, also because it is from UV
+        //public Plane Frame;
 
         public Polyline PlatePolyline;
-        public Curve PlateCurve;
+        // Curve Cannot be set to "null". are there properties of Curve I need taht Polyline does not have?
+        //public Curve PlateCurve;
 
-        public RailsAgent(Point3d startPosition, List<BehaviorBase> behaviors) : base(startPosition, behaviors)
+        /// <summary>
+        /// The list of 2-dimensional moves
+        /// </summary>
+        public List<Vector2d> Moves = new List<Vector2d>();
+        public List<double> Weights = new List<double>();
+
+
+        public RailsAgent(double startPosition, List<BehaviorBase> behaviors) : base(startPosition, behaviors)
         {
-            this.StartPosition = this.Position = startPosition;
+            this.StartLocation = this.LocationParameter = startPosition;
             this.Behaviors = behaviors;
         }
 
@@ -30,9 +46,10 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// </summary>
         public override void Reset()
         {
-            this.Position = this.StartPosition;
+            this.LocationParameter = this.StartLocation;
             Moves.Clear();
             Weights.Clear();
+            PlatePolyline.Clear();
         }
 
         /// <summary>
