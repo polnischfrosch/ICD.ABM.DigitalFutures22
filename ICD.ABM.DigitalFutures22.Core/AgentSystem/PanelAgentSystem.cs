@@ -1,13 +1,14 @@
-﻿using Grasshopper.Kernel.Geometry;
+﻿using ABxM.Core.Agent;
+using ABxM.Core.AgentSystem;
+using Grasshopper.Kernel.Geometry;
 using Grasshopper.Kernel.Geometry.Delaunay;
 using ICD.ABM.DigitalFutures22.Core.Agent;
 using ICD.ABM.DigitalFutures22.Core.Environments;
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
 using Rhino;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 {
@@ -59,9 +60,10 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
         public override void PreExecute()
         {
-            //base.PreExecute();
+            base.PreExecute();
             this.SystemMesh = computeConnectivityMesh();
             ComputeCells();
+            FindEdgeAgents();
         }
 
         public override void Execute()
@@ -188,7 +190,24 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             computeVoronoi();
         }
 
+        public void FindEdgeAgents()
+        {
+            List<double> UValues = new List<double>();
 
+            foreach (PanelAgent agent in Agents)
+            {
+                UValues.Add(agent.UV.X);
+            }
+
+            double minVal = UValues.Min();
+            double maxVal = UValues.Max();
+
+            int indexMin = UValues.IndexOf(minVal);
+            int indexMax = UValues.IndexOf(maxVal);
+
+            (Agents[indexMin] as PanelAgent).IsEdge = true;
+            (Agents[indexMax] as PanelAgent).IsEdge = true;
+        }
 
         ///// <summary>
         ///// Computes the Delaunay mesh that correponds to the agent positions.

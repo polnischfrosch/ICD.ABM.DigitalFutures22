@@ -1,7 +1,7 @@
-﻿using ICD.ABM.DigitalFutures22.Core.AgentSystem;
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Behavior;
+﻿using ABxM.Core.Agent;
+using ABxM.Core.AgentSystem;
+using ABxM.Core.Behavior;
+using ICD.ABM.DigitalFutures22.Core.AgentSystem;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;

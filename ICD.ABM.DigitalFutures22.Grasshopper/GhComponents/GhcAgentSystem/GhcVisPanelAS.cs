@@ -62,38 +62,71 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
                     List<double> distances = new List<double>();
 
                     // TO DO: getting only closest results in not always picking all connections, find other solution
-                    foreach (PanelAgent otherAgent in agent.NeighborsOnRail)
+                    //foreach (PanelAgent otherAgent in agent.NeighborsOnRail)
+                    //{
+                    //    distances.Add(agent.Position.DistanceTo(otherAgent.Position));
+                    //}
+
+                    //double minVal = distances.Min();
+                    //int index = distances.IndexOf(minVal);
+
+                    foreach (PanelAgent dNeighbor in agent.DirectNeighborsOnRail)
                     {
-                        distances.Add(agent.Position.DistanceTo(otherAgent.Position));
+
+                        LineCurve ln = new LineCurve(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                                  agent.UV.X, agent.UV.Y),
+                                                     system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                                  dNeighbor.UV.X, dNeighbor.UV.Y));
+                        neighborsOnRail.Add(ln);
+
+                        Point3d mid = ln.PointAtNormalizedLength(0.5);
+
+                        LineCurve ln2D = new LineCurve(new Point3d(agent.UV.X, agent.UV.Y, 0.0),
+                                                       new Point3d(dNeighbor.UV.X, dNeighbor.UV.Y, 0.0));
+
+                        Point3d mid2D = ln2D.PointAtNormalizedLength(0.5);
+
+                        Vector3d vec = ln.PointAtStart - ln.PointAtEnd;
+
+                        Vector3d dir = Vector3d.CrossProduct(vec, system.RailEnvironment.BrepObject.Surfaces[0].NormalAt(
+                            system.RailEnvironment.UVCoordinates(mid).X,
+                            system.RailEnvironment.UVCoordinates(mid).Y));
+
+                        //plane intersection
+                        Curve[] itxCrv = null;
+                        Point3d[] itxPts = null;
+
+                        Point3d plnPos = system.RailEnvironment.BrepObject.Surfaces[0].PointAt(mid2D.X, mid2D.Y);
+
+                        Plane cutPlane = new Plane(plnPos, dir, system.RailEnvironment.BrepObject.Surfaces[0].NormalAt(
+                          system.RailEnvironment.UVCoordinates(mid).X,
+                          system.RailEnvironment.UVCoordinates(mid).Y));
+
+                        bool intersect = Rhino.Geometry.Intersect.Intersection.BrepPlane(agent.Rail, cutPlane, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, out itxCrv, out itxPts);
+
+                        cutPlanes.Add(cutPlane);
+
+                        if (intersect)
+                        {
+                            if (itxCrv.Count() > 1)
+                            {
+                                foreach (Curve c in itxCrv)
+                                {
+                                    double t;
+                                    bool closest = c.ClosestPoint(plnPos, out t, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+                                    if (closest)
+                                    {
+                                        panelCuts.Add(c);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                panelCuts.Add(itxCrv[0]);
+                            }
+                        }
                     }
-
-                    double minVal = distances.Min();
-                    int index = distances.IndexOf(minVal);
-
-                    LineCurve ln = new LineCurve(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
-                                                              agent.UV.X, agent.UV.Y),
-                                                 system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
-                                                              agent.NeighborsOnRail[index].UV.X,
-                                                              agent.NeighborsOnRail[index].UV.Y));
-
-                    LineCurve ln2D = new LineCurve(new Point3d(
-                                                             agent.UV.X, agent.UV.Y, 0.0),
-                                                new Point3d(
-                                                             agent.NeighborsOnRail[index].UV.X,
-                                                             agent.NeighborsOnRail[index].UV.Y, 0.0));
-
-                    neighborsOnRail.Add(ln);
-
-                    Point3d mid = ln.PointAtNormalizedLength(0.5);
-
-                    Point3d mid2D = ln2D.PointAtNormalizedLength(0.5);
-
-                    Vector3d vec = ln.PointAtStart - ln.PointAtEnd;
-
-                    Vector3d dir = Vector3d.CrossProduct(vec, system.RailEnvironment.BrepObject.Surfaces[0].NormalAt(
-                        system.RailEnvironment.UVCoordinates(mid).X,
-                        system.RailEnvironment.UVCoordinates(mid).Y));
-
                     //Vector3d dir = Vector3d.CrossProduct(vec, Vector3d.ZAxis);
 
                     //Line l = new Line(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
@@ -104,42 +137,6 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
                     //                                          system.RailEnvironment.UVCoordinates(mid).Y), -dir, 200);
 
                     //Line l2D = new Line(system.RailEnvironment.UVCoordinates(mid), dir, 100000);
-
-                    //plane intersection
-                    Curve[] itxCrv = null;
-                    Point3d[] itxPts = null;
-
-                    Point3d plnPos = system.RailEnvironment.BrepObject.Surfaces[0].PointAt(mid2D.X, mid2D.Y);
-
-                    Plane cutPlane = new Plane(plnPos, dir, system.RailEnvironment.BrepObject.Surfaces[0].NormalAt(
-                      system.RailEnvironment.UVCoordinates(mid).X,
-                      system.RailEnvironment.UVCoordinates(mid).Y));
-
-                    bool intersect = Rhino.Geometry.Intersect.Intersection.BrepPlane(agent.Rail, cutPlane, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, out itxCrv, out itxPts);
-
-                    cutPlanes.Add(cutPlane);
-
-                    if (intersect)
-                    {
-                        if (itxCrv.Count() > 1)
-                        {
-                            foreach (Curve c in itxCrv)
-                            {
-                                double t;
-                                bool closest = c.ClosestPoint(plnPos, out t, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
-
-                                if (closest)
-                                {
-                                    panelCuts.Add(c);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            panelCuts.Add(itxCrv[0]);
-                        }
-                    }
-
                 }
                 mesh = system.SystemMesh;
             }
