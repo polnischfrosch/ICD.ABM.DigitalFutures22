@@ -1,15 +1,12 @@
-﻿using System;
+﻿using ABxM.Core.Agent;
+using ABxM.Core.Behavior;
+using ICD.ABM.DigitalFutures22.Core.AgentSystem;
+using Rhino.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using Rhino.Geometry;
-
-using ICD.AbmFramework.Core.Behavior;
-using ICD.AbmFramework.Core.Agent;
-
-using ICD.ABM.DigitalFutures22.Core.AgentSystem;
 
 namespace ICD.ABM.DigitalFutures22.Core.Agent
 {
@@ -19,7 +16,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         private Point2d startUV;
         public Polyline Trail = new Polyline();
         public bool isFinished = false;
-        
+
         /// <summary>
         /// The list of 2-dimensional moves
         /// </summary>
@@ -48,7 +45,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 
         public override void Execute()
         {
-            if(this.isFinished)
+            if (this.isFinished)
                 return;
 
             foreach (BehaviorBase behavior in this.Behaviors)

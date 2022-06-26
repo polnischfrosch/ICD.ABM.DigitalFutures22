@@ -1,8 +1,9 @@
-﻿using ICD.ABM.DigitalFutures22.Core.AgentSystem;
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.Behavior;
+﻿using ABxM.Core.Agent;
+using ABxM.Core.Behavior;
+using ICD.ABM.DigitalFutures22.Core.AgentSystem;
 using Rhino.Geometry;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICD.ABM.DigitalFutures22.Core.Agent
 {
@@ -14,7 +15,9 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public Polyline Trail = new Polyline();
         public Polyline Cell = new Polyline();
         public List<PanelAgent> NeighborsOnRail = new List<PanelAgent>();
+        public List<PanelAgent> DirectNeighborsOnRail = new List<PanelAgent>();
         public Brep Rail = null;
+        public bool IsEdge;
 
         public bool isFinished = false;
 
@@ -41,6 +44,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 
             FindRail();
             FindNeighborsOnRail();
+            FindDirectNeighborsOnRail();
         }
 
         public override void PreExecute()
@@ -48,9 +52,11 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
             this.Moves.Clear();
 
             //this.Position = (this.AgentSystem as PanelAgentSystem).RailEnvironment.BrepObject.Surfaces[0].PointAt(this.UV.X, this.UV.Y);
-
+            this.Rail = null;
             FindRail();
+
             FindNeighborsOnRail();
+            FindDirectNeighborsOnRail();
         }
 
         public override void Execute()
@@ -161,6 +167,35 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
                 }
             }
             this.NeighborsOnRail = neighborsOnRail;
+        }
+
+
+        public void FindDirectNeighborsOnRail()
+        {
+            List<PanelAgent> directNeighborsOnRail = new List<PanelAgent>();
+
+            List<double> distances = new List<double>();
+
+            foreach (PanelAgent otherAgent in this.NeighborsOnRail)
+            {
+
+                distances.Add(this.Position.DistanceTo(otherAgent.Position));
+            }
+
+            double minVal = distances.Min();
+            int index = distances.IndexOf(minVal);
+
+            directNeighborsOnRail.Add(this.NeighborsOnRail[index]);
+
+            // if agents are not on the outer edge, they should have another neighbor
+            if (!this.IsEdge)
+            {
+                var secondLowest = distances.OrderBy(num => num).ElementAt(0); // should be 1 not zero, just debugging
+                int indexSecondLowest = distances.IndexOf(secondLowest);
+                directNeighborsOnRail.Add(this.NeighborsOnRail[indexSecondLowest]);
+            }
+
+            this.DirectNeighborsOnRail = directNeighborsOnRail;
         }
     }
 }
