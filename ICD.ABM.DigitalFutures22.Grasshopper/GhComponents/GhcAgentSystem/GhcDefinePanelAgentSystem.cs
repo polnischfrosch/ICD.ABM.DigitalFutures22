@@ -15,7 +15,7 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgentSystem
         public GhcDefinePanelAgentSystem()
           : base("GhcDefinePanelAgentSystem", "PanelAgentSystem",
               "DefinePanelAgentSystem",
-              "ICD", "DigitalFutures2022")
+              "ABxM", "DigitalFutures2022")
         {
         }
 
