@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Reference Include="ABxM.Core">
-      <HintPath>..\..\..\..\AppData\Roaming\Grasshopper\Libraries\ABxM.Core.dll</HintPath>
+      <HintPath>$(AppData)\Grasshopper\Libraries\ABxM.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
