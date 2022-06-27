@@ -1,17 +1,18 @@
-﻿using Grasshopper.Kernel.Geometry;
+﻿using ABxM.Core.Agent;
+using ABxM.Core.AgentSystem;
+using Grasshopper.Kernel.Geometry;
 using Grasshopper.Kernel.Geometry.Delaunay;
 using ICD.ABM.DigitalFutures22.Core.Agent;
 using ICD.ABM.DigitalFutures22.Core.Environments;
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
 using Rhino;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 {
-    public class PanelAgentSystem : AgentSystemBase
+    public partial class PanelAgentSystem : AgentSystemBase
     {
         public RailEnvironment RailEnvironment = null;
 
@@ -59,9 +60,14 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 
         public override void PreExecute()
         {
-            //base.PreExecute();
+            base.PreExecute();
             this.SystemMesh = computeConnectivityMesh();
-            ComputePlates();
+            ComputeCells();
+
+            foreach (PanelAgent agent in Agents)
+                agent.IsEdge = false;
+
+            FindEdgeAgents();
         }
 
         public override void Execute()
@@ -100,25 +106,6 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             {
                 if (agent != otherAgent && agent.UV.DistanceTo(otherAgent.UV) < distance)
                     panelAgentList.Add(otherAgent);
-            }
-
-            return panelAgentList;
-        }
-
-        /// <summary>
-        /// Find all agents that are topologically connected to a given agent
-        /// </summary>
-        /// <param name="agent">The agent to search from.</param>
-        /// <returns>Returns the list of topologically connected neighboring agents.</returns>
-        public List<PanelAgent> FindTopologicalNeighbors(PanelAgent agent)
-        {
-            List<PanelAgent> panelAgentList = new List<PanelAgent>();
-
-            List<int> connections = diagram.GetConnections(agent.Id);
-
-            foreach (int index in connections)
-            {
-                panelAgentList.Add((PanelAgent)(this.Agents[index]));
             }
 
             return panelAgentList;
@@ -165,7 +152,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             return SystemMesh;
         }
 
-        private void computeCells()
+        private void computeVoronoi()
         {
             List<Grasshopper.Kernel.Geometry.Voronoi.Cell2> cells = Grasshopper.Kernel.Geometry.Voronoi.Solver.Solve_Connectivity(nodes, diagram, outline);
 
@@ -183,7 +170,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             }
         }
 
-        public void ComputePlates()
+        public void ComputeCells()
         {
             Polyline poly;
             PolylineCurve polyCrv;
@@ -204,7 +191,123 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
             outline = new Node2List(poly);
 
             computeConnectivityMesh();
-            computeCells();
+            computeVoronoi();
+        }
+
+        public void FindEdgeAgents()
+        {
+            foreach (Brep rail in RailEnvironment.Rails)
+            {
+                List<Curve> boundaryCurves = new List<Curve>();
+                boundaryCurves.AddRange(rail.Curves2D);
+
+                List<double> lengths = new List<double>();
+                List<Point3d> cPoints = new List<Point3d>();
+
+                foreach (Curve c in boundaryCurves)
+                {
+                    lengths.Add(c.GetLength());
+                }
+                var orderedLengths = lengths.OrderBy(num => num);
+
+                double minLen = orderedLengths.ElementAt(0);
+                int indexLen = lengths.IndexOf(minLen);
+
+                List<double> distancesA = new List<double>();
+
+                foreach (PanelAgent agent in Agents)
+                {
+                    double param;
+                    boundaryCurves[indexLen].ClosestPoint(new Point3d(agent.UV.X, agent.UV.Y, 0.0), out param);
+                    Point3d t = boundaryCurves[indexLen].PointAt(param);
+                    distancesA.Add(new Point3d(agent.UV.X, agent.UV.Y, 0.0).DistanceTo(t));
+                }
+
+                double minDistA = distancesA.Min();
+                int indexDistA = distancesA.IndexOf(minDistA);
+
+                (Agents[indexDistA] as PanelAgent).IsEdge = true;
+
+                // find second smallest edge
+                if (orderedLengths.ElementAt(0) == orderedLengths.ElementAt(1))
+                {
+                    int firstNumberIndex = lengths.IndexOf(orderedLengths.ElementAt(0)); //returns first record index, true
+                    int secondNumberIndex = lengths.IndexOf(orderedLengths.ElementAt(0), firstNumberIndex + 1); //will start search next to last ocurrence
+
+                    List<double> distancesB = new List<double>();
+
+                    foreach (PanelAgent agent in Agents)
+                    {
+                        double param;
+                        boundaryCurves[secondNumberIndex].ClosestPoint(new Point3d(agent.UV.X, agent.UV.Y, 0.0), out param);
+                        Point3d t = boundaryCurves[secondNumberIndex].PointAt(param);
+                        distancesB.Add(new Point3d(agent.UV.X, agent.UV.Y, 0.0).DistanceTo(t));
+                    }
+
+                    double minDistB = distancesB.Min();
+                    int indexDistB = distancesB.IndexOf(minDistB);
+
+                    (Agents[indexDistB] as PanelAgent).IsEdge = true;
+                }
+                else
+                {
+                    var secondLowest = orderedLengths.ElementAt(1);
+                    int indexSecondLowest = lengths.IndexOf(secondLowest);
+
+                    List<double> distancesB = new List<double>();
+
+                    foreach (PanelAgent agent in Agents)
+                    {
+                        double param;
+                        boundaryCurves[indexSecondLowest].ClosestPoint(new Point3d(agent.UV.X, agent.UV.Y, 0.0), out param);
+                        Point3d t = boundaryCurves[indexSecondLowest].PointAt(param);
+                        distancesB.Add(new Point3d(agent.UV.X, agent.UV.Y, 0.0).DistanceTo(t));
+                    }
+
+                    double minDistB = distancesB.Min();
+                    int indexDistB = distancesB.IndexOf(minDistB);
+
+                    (Agents[indexDistB] as PanelAgent).IsEdge = true;
+                }
+            }
+        }
+
+        public void FindEdgeAgentsUV()
+        {
+            foreach (Brep rail in RailEnvironment.Rails)
+            {
+                List<double> UValues = new List<double>();
+
+                foreach (PanelAgent agent in Agents)
+                {
+                    Point3d cloPt = rail.ClosestPoint(agent.Position);
+
+                    // check if agent is on rail
+                    if (agent.Position.DistanceTo(cloPt) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
+                    {
+                        Surface surface = rail.Surfaces[0];
+                        double u, v;
+
+                        surface.ClosestPoint(cloPt, out u, out v);
+
+                        UValues.Add(agent.UV.X);
+                    }
+                    else
+                    {
+                        UValues.Add(double.NaN);
+                    }
+                }
+
+                // the problem was that .Min() will respond to NaN
+                double minVal(IEnumerable<double> columnValues) => columnValues.Where(c => !double.IsNaN(c)).Min();
+                double maxVal = UValues.Max();
+
+                int indexMin = UValues.IndexOf(minVal(UValues));
+                int indexMax = UValues.IndexOf(maxVal);
+
+                (Agents[indexMin] as PanelAgent).IsEdge = true;
+                (Agents[indexMax] as PanelAgent).IsEdge = true;
+            }
         }
 
         ///// <summary>

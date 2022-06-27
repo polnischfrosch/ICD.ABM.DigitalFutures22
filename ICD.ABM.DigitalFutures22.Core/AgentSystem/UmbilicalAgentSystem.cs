@@ -1,19 +1,16 @@
-﻿using System;
+﻿using ABxM.Core.Agent;
+using ABxM.Core.AgentSystem;
+using ICD.ABM.DigitalFutures22.Core.Agent;
+using Rhino.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Rhino.Geometry;
-
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
-
-using ICD.ABM.DigitalFutures22.Core.Agent;
-
 namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 {
-    public class UmbilicalAgentSystem: AgentSystemBase
+    public class UmbilicalAgentSystem : AgentSystemBase
     {
         public Surface SystemSurface = null;
 

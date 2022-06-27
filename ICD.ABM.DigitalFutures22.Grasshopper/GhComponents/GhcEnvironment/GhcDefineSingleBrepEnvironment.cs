@@ -1,9 +1,8 @@
-﻿using Grasshopper.Kernel;
+﻿using ABxM.Core.Utilities;
+using Grasshopper.Kernel;
 using ICD.ABM.DigitalFutures22.Core.Agent;
 using ICD.ABM.DigitalFutures22.Core.AgentSystem;
-using ICD.ABM.DigitalFutures22.Core.Behavior;
 using ICD.ABM.DigitalFutures22.Core.Environments;
-using ICD.AbmFramework.Core.Utilities;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcEnvironment
         public GhcDefineSingleBrepEnvironment()
           : base("GhcDefineSingleBrepEnvironment", "GhcDefineSingleBrepEnvironment",
               "GhcDefineSingleBrepEnvironment",
-              "ICD", "DigitalFutures2022")
+              "ABxM", "DigitalFutures2022")
         {
         }
 

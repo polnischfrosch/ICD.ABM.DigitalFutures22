@@ -12,9 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="ICD.AbmFramework.Core">
-      <HintPath>$(AppData)\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
+    <Reference Include="ABxM.Core">
+      <HintPath>..\..\..\..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\ABxM.Core.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Behavior\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
