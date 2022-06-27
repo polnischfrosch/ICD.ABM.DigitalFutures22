@@ -17,6 +17,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
     public class RailsAgentSystem: AgentSystemBase
     {
         public SingleBrepEnvironment SingleBrepEnvironment = null;
+        public Surface SystemSurface = null;
 
         public RailsAgentSystem(List<UmbilicalAgent> agents)
         {

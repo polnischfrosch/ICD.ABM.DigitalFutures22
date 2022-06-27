@@ -18,10 +18,9 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
     {
         public double T = -1.0;
         private double startT;
-        
-        public Polyline PlatePolyline;
-        // Curve Cannot be set to "null". are there properties of Curve I need taht Polyline does not have?
-        //public Curve PlateCurve;
+
+        public Curve SystemCurve;
+        public Polyline flowCurve = new Polyline();
 
         /// <summary>
         /// The list of 2-dimensional moves
@@ -30,10 +29,11 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public List<double> Weights = new List<double>();
 
 
-        public RailsAgent(double parameter, List<BehaviorBase> behaviors)
+        public RailsAgent(double parameter, Curve systemCurve, List<BehaviorBase> behaviors)
         {
             this.startT = this.T = parameter;
             this.Behaviors = behaviors;
+            this.SystemCurve = systemCurve;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
             this.T = this.startT;
             Moves.Clear();
             Weights.Clear();
-            PlatePolyline.Clear();
+            //SystemCurve.Clear(); // how to clear a curve?
         }
 
         /// <summary>
@@ -87,27 +87,29 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
             if (totalWeight > 0.0)
                 this.T += totalWeightedMove / totalWeight;
 
-            // point on curve
-            // surface cp
-            // get UV
-            // draw flow curve
-
             // ## After update position ## //
+            // point on curve
+            Point3d pointOnCurve = SystemCurve.PointAt(this.T);
+            // surface cp get UV
+            double u, v;
+            (this.AgentSystem as RailsAgentSystem).SystemSurface.ClosestPoint(pointOnCurve, out u, out v);
+            Point3d surfaceUV = new Point3d(u, v, 0.0);
             // Find flow line
             //Limit the accuracy to the document tolerance.
             double accuracy = 1.0;
             //accuracy = System.Convert.ToDouble(Math.Max(accuracy, doc.ModelAbsoluteTolerance));
+            bool max = false; // set which direction, either 1,0 or 0,1 in GetDir
 
             //Declare our list of samples.
-            List<Point3d> dir0 = SampleCurvature(this.AgentSystem.SingleBrepEnvironment.BrepObject, uv, accuracy, max, 0, 3);
-            List<Point3d> dir1 = SampleCurvature(srf, uv, accuracy, max, Math.PI, 3);
+            List<Point3d> dir0 = SampleCurvature((this.AgentSystem as RailsAgentSystem).SystemSurface, surfaceUV, accuracy, max, 0);
+            List<Point3d> dir1 = SampleCurvature((this.AgentSystem as RailsAgentSystem).SystemSurface, surfaceUV, accuracy, max, Math.PI);
 
             //Remove the first point in dir1 as it's a duplicate
             dir1.RemoveAt(0);
             dir1.Reverse();
 
             dir1.AddRange(dir0);
-            pts = dir1;
+            flowCurve = new Polyline(dir1);
         }
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// <returns>Returns a list containing each agent's position.</returns>
         public override List<object> GetDisplayGeometries()
         {
-            //return new List<object> { Frame, PlatePolyline };
+            //return new List<object> { Frame, SystemCurve };
             return new List<object> { };
         }
 
@@ -137,7 +139,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// <returns>
         /// returns a list of p3d
         /// </returns>
-        private List<Point3d> SampleCurvature(Surface srf, Point3d uv, double accuracy, bool max, double angle, int alg)
+        private List<Point3d> SampleCurvature(Surface srf, Point3d uv, double accuracy, bool max, double angle)
         {
             Point3d p = uv;
             Interval U = srf.Domain(0);
@@ -149,24 +151,12 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
                 //Add the current point.
                 samples.Add(srf.PointAt(p.X, p.Y));
 
-                //####################################
-                //##### Euler/Modified Euler/RK4 #####
-                //####################################
+                //####################
+                //##### JUST RK4 #####
+                //####################
                 Vector3d dir = new Vector3d();
 
-                switch (alg)
-                {
-                    case 1:
-                        dir = Euler(srf, p, max, angle, accuracy, samples);
-                        break;
-                    case 2:
-                        dir = ModEuler(srf, p, max, angle, accuracy, samples);
-                        break;
-                    case 3:
-                        dir = RK4(srf, p, max, angle, accuracy, samples);
-                        break;
-
-                }
+                dir = RK4(srf, p, max, angle, accuracy, samples);
 
                 if (ReferenceEquals(dir, null))
                 {
