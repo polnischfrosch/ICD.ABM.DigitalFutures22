@@ -13,7 +13,7 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcEnvironment
         public GhcDefineRailEnvironment()
           : base("GhcDefineRailEnvironment", "GhcDefineRailEnvironment",
               "GhcDefineRailEnvironment",
-              "ICD", "DigitalFutures2022")
+              "ABxM", "DigitalFutures2022")
         {
         }
 

@@ -14,12 +14,20 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public Point2d startUV;
         public Polyline Trail = new Polyline();
         public Polyline Cell = new Polyline();
-        public List<PanelAgent> NeighborsOnRail = new List<PanelAgent>();
-        public List<PanelAgent> DirectNeighborsOnRail = new List<PanelAgent>();
+        public bool isFinished = false;
+
         public Brep Rail = null;
         public bool IsEdge;
 
-        public bool isFinished = false;
+        public List<PanelAgent> NeighborsOnRail = new List<PanelAgent>();
+        public List<PanelAgent> DirectNeighborsOnRail = new List<PanelAgent>();
+        public List<LineCurve> DirectNeighborConnections = new List<LineCurve>();
+
+        public List<Plane> CutPlanes = new List<Plane>();
+        public List<Curve> PanelCuts = new List<Curve>();
+
+        public Brep Panel = null;
+        public double PanelArea;
 
         /// <summary>
         /// The list of 2-dimensional moves
@@ -53,10 +61,14 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 
             //this.Position = (this.AgentSystem as PanelAgentSystem).RailEnvironment.BrepObject.Surfaces[0].PointAt(this.UV.X, this.UV.Y);
             this.Rail = null;
+            this.CutPlanes.Clear();
+            this.PanelCuts.Clear();
+            this.DirectNeighborConnections.Clear();
             FindRail();
 
             FindNeighborsOnRail();
             FindDirectNeighborsOnRail();
+            GetPanelCuts();
         }
 
         public override void Execute()
@@ -153,22 +165,26 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 
         public void FindNeighborsOnRail()
         {
-            List<PanelAgent> topoNeighbors = FindTopologicalNeighbors();
+            //List<PanelAgent> topoNeighbors = FindTopologicalNeighbors();
 
             List<PanelAgent> neighborsOnRail = new List<PanelAgent>();
 
-            foreach (PanelAgent otherAgent in topoNeighbors)
+            //foreach (PanelAgent otherAgent in topoNeighbors)
+            foreach (PanelAgent otherAgent in AgentSystem.Agents)
             {
-                Point3d cloPt = this.Rail.ClosestPoint(otherAgent.Position);
-
-                if (otherAgent.Position.DistanceTo(cloPt) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
+                if (otherAgent != this)
                 {
-                    neighborsOnRail.Add(otherAgent);
+                    Point3d cloPt = Rail.ClosestPoint(otherAgent.Position);
+
+
+                    if (otherAgent.Position.DistanceTo(cloPt) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance)
+                    {
+                        neighborsOnRail.Add(otherAgent);
+                    }
                 }
             }
             this.NeighborsOnRail = neighborsOnRail;
         }
-
 
         public void FindDirectNeighborsOnRail()
         {
@@ -176,26 +192,191 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 
             List<double> distances = new List<double>();
 
-            foreach (PanelAgent otherAgent in this.NeighborsOnRail)
+            foreach (PanelAgent otherAgent in NeighborsOnRail)
             {
-
                 distances.Add(this.Position.DistanceTo(otherAgent.Position));
             }
 
             double minVal = distances.Min();
             int index = distances.IndexOf(minVal);
 
-            directNeighborsOnRail.Add(this.NeighborsOnRail[index]);
+            directNeighborsOnRail.Add(NeighborsOnRail[index]);
 
             // if agents are not on the outer edge, they should have another neighbor
             if (!this.IsEdge)
             {
-                var secondLowest = distances.OrderBy(num => num).ElementAt(0); // should be 1 not zero, just debugging
+                var secondLowest = distances.OrderBy(num => num).ElementAt(1);
+
                 int indexSecondLowest = distances.IndexOf(secondLowest);
-                directNeighborsOnRail.Add(this.NeighborsOnRail[indexSecondLowest]);
+
+                // check whether the second closest neighbor is in the wrong direction
+                if ((UV.X < NeighborsOnRail[index].UV.X &&
+                NeighborsOnRail[indexSecondLowest].UV.X > NeighborsOnRail[index].UV.X) ||
+                (UV.X > NeighborsOnRail[index].UV.X &&
+                NeighborsOnRail[indexSecondLowest].UV.X < NeighborsOnRail[index].UV.X) ||
+                (UV.X < NeighborsOnRail[index].UV.X &&
+                 UV.X < NeighborsOnRail[indexSecondLowest].UV.X))
+                {
+                    var thirdLowest = distances.OrderBy(num => num).ElementAt(2);
+
+                    int indexThirdLowest = distances.IndexOf(thirdLowest);
+                    directNeighborsOnRail.Add(NeighborsOnRail[indexThirdLowest]);
+                }
+                else
+                {
+                    directNeighborsOnRail.Add(NeighborsOnRail[indexSecondLowest]);
+                }
             }
 
             this.DirectNeighborsOnRail = directNeighborsOnRail;
+        }
+
+        public void FindDirectNeighborsOnRailUV()
+        {
+            List<PanelAgent> directNeighborsOnRail = new List<PanelAgent>();
+
+            List<double> distances = new List<double>();
+
+            foreach (PanelAgent otherAgent in NeighborsOnRail)
+            {
+                distances.Add(this.Position.DistanceTo(otherAgent.Position));
+            }
+
+            double minVal = distances.Min();
+            int index = distances.IndexOf(minVal);
+
+            var secondLowest = distances.OrderBy(num => num).ElementAt(1);
+
+            int indexSecondLowest = distances.IndexOf(secondLowest);
+
+            // check whether the u values of the second closest are closer
+            if ((UV.X < NeighborsOnRail[index].UV.X &&
+                NeighborsOnRail[indexSecondLowest].UV.X < NeighborsOnRail[index].UV.X))
+            {
+                var thirdLowest = distances.OrderBy(num => num).ElementAt(2);
+
+                int indexThirdLowest = distances.IndexOf(thirdLowest);
+                directNeighborsOnRail.Add(NeighborsOnRail[indexThirdLowest]);
+            }
+            else
+            {
+                directNeighborsOnRail.Add(NeighborsOnRail[index]);
+            }
+
+            // if agents are not on the outer edge, they should have another neighbor
+            if (!this.IsEdge)
+            {
+
+
+                // check whether the second closest neighbor is in the wrong direction
+                if ((UV.X < NeighborsOnRail[index].UV.X &&
+                NeighborsOnRail[indexSecondLowest].UV.X > NeighborsOnRail[index].UV.X) ||
+                (UV.X > NeighborsOnRail[index].UV.X &&
+                NeighborsOnRail[indexSecondLowest].UV.X < NeighborsOnRail[index].UV.X) ||
+                (UV.X < NeighborsOnRail[index].UV.X &&
+                 UV.X < NeighborsOnRail[indexSecondLowest].UV.X //||
+                                                                //UV.X > NeighborsOnRail[index].UV.X &&
+                                                                //UV.X > NeighborsOnRail[indexSecondLowest].UV.X //||
+                                                                //NeighborsOnRail[indexSecondLowest].UV.X < NeighborsOnRail[index].UV.X ||
+                                                                //NeighborsOnRail[indexSecondLowest].UV.X > NeighborsOnRail[index].UV.X
+                 ))
+
+                {
+                    var thirdLowest = distances.OrderBy(num => num).ElementAt(2);
+
+                    int indexThirdLowest = distances.IndexOf(thirdLowest);
+                    directNeighborsOnRail.Add(NeighborsOnRail[indexThirdLowest]);
+                }
+                else
+                {
+                    directNeighborsOnRail.Add(NeighborsOnRail[indexSecondLowest]);
+                }
+            }
+
+            this.DirectNeighborsOnRail = directNeighborsOnRail;
+        }
+
+        public void GetPanelCuts()
+        {
+            PanelAgentSystem system = this.AgentSystem as PanelAgentSystem;
+
+            foreach (PanelAgent dNeighbor in DirectNeighborsOnRail)
+            {
+
+                LineCurve ln = new LineCurve(system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                          UV.X, UV.Y),
+                                             system.RailEnvironment.BrepObject.Surfaces[0].PointAt(
+                                                          dNeighbor.UV.X, dNeighbor.UV.Y));
+                DirectNeighborConnections.Add(ln);
+
+                Point3d mid = ln.PointAtNormalizedLength(0.5);
+
+                LineCurve ln2D = new LineCurve(new Point3d(UV.X, UV.Y, 0.0),
+                                               new Point3d(dNeighbor.UV.X, dNeighbor.UV.Y, 0.0));
+
+                Point3d mid2D = ln2D.PointAtNormalizedLength(0.5);
+
+                Vector3d vec = ln.PointAtStart - ln.PointAtEnd;
+
+                Vector3d dir = Vector3d.CrossProduct(vec, system.RailEnvironment.BrepObject.Surfaces[0].NormalAt(
+                    system.RailEnvironment.UVCoordinates(mid).X,
+                    system.RailEnvironment.UVCoordinates(mid).Y));
+
+                //plane intersection
+                Curve[] itxCrv = null;
+                Point3d[] itxPts = null;
+
+                Point3d plnPos = system.RailEnvironment.BrepObject.Surfaces[0].PointAt(mid2D.X, mid2D.Y);
+
+                Plane cutPlane = new Plane(plnPos, dir, system.RailEnvironment.BrepObject.Surfaces[0].NormalAt(
+                  system.RailEnvironment.UVCoordinates(mid).X,
+                  system.RailEnvironment.UVCoordinates(mid).Y));
+
+                bool intersect = Rhino.Geometry.Intersect.Intersection.BrepPlane(Rail, cutPlane, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, out itxCrv, out itxPts);
+
+                CutPlanes.Add(cutPlane);
+
+                if (intersect)
+                {
+                    if (itxCrv.Count() > 1)
+                    {
+                        foreach (Curve c in itxCrv)
+                        {
+                            double t;
+                            bool closest = c.ClosestPoint(plnPos, out t, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+                            if (closest)
+                            {
+                                PanelCuts.Add(c);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        PanelCuts.Add(itxCrv[0]);
+                    }
+                }
+            }
+        }
+
+        public Brep GetPanelSurface()
+        {
+            Brep[] splits = Rail.Split(PanelCuts, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+
+            Brep panel = null;
+
+            foreach (Brep b in splits)
+            {
+                if (b.ClosestPoint(Position).DistanceTo(Position) < Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance) ;
+                {
+                    panel = b;
+                }
+            }
+
+            Panel = panel;
+            PanelArea = panel.GetArea();
+
+            return panel;
         }
     }
 }
