@@ -1,6 +1,6 @@
-﻿using Grasshopper.Kernel;
+﻿using ABxM.Core.Behavior;
+using Grasshopper.Kernel;
 using ICD.ABM.DigitalFutures22.Core.Agent;
-using ICD.AbmFramework.Core.Behavior;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgent
         public GhcDefinePanelAgent()
           : base("GhcDefinePanelAgent", "PanelAgent",
               "PanelAgent",
-              "ICD", "DigitalFutures2022")
+              "ABxM", "DigitalFutures2022")
         {
         }
 

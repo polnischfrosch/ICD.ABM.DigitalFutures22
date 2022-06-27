@@ -14,8 +14,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Reference Include="ICD.AbmFramework.Core">
-      <HintPath>$(AppData)\Grasshopper\Libraries\ICD.AbmFramework.Core.dll</HintPath>
+    <Reference Include="ABxM.Core">
+      <HintPath>..\..\..\..\..\..\..\..\AppData\Roaming\Grasshopper\Libraries\ABxM.Core.dll</HintPath>
     </Reference>
     <Reference Include="RhinoCommon">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Rhino 7\System\RhinoCommon.dll</HintPath>
@@ -24,6 +24,10 @@
   
   <ItemGroup>
     <ProjectReference Include="..\ICD.ABM.DigitalFutures22.Core\ICD.ABM.DigitalFutures22.Core.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="GhComponents\GhcBehavior\" />
   </ItemGroup>
   
   <PropertyGroup Condition="$(Configuration) == 'Debug' AND $([MSBuild]::IsOSPlatform(Windows))">

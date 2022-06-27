@@ -1,4 +1,4 @@
-﻿using ICD.AbmFramework.Core.Environments;
+﻿using ABxM.Core.Environments;
 using Rhino.Geometry;
 using System;
 using System.Collections.Generic;
@@ -10,13 +10,11 @@ namespace ICD.ABM.DigitalFutures22.Core.Environments
 {
     public class RailEnvironment : SingleBrepEnvironment
     {
-        public List<Curve> RailCurves;
         public List<Brep> Rails;
 
-        public RailEnvironment(Brep brep, List<Curve> railCurves, List<Brep> rails)
+        public RailEnvironment(Brep brep, List<Brep> rails)
         {
             BrepObject = brep;
-            RailCurves = railCurves;
             Rails = rails;
         }
 
