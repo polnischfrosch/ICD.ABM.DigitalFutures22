@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 using Rhino.Geometry;
 
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
-using ICD.AbmFramework.Core.Behavior;
+using ABxM.Core.Agent;
+using ABxM.Core.AgentSystem;
+using ABxM.Core.Behavior;
 
 using ICD.ABM.DigitalFutures22.Core.AgentSystem;
 
@@ -16,14 +16,9 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 {
     public class RailsAgent : AgentBase
     {
-        public double LocationParameter = -1.0;
-        public double StartLocation = -1.0;
+        public double T = -1.0;
+        private double startT;
         
-        // Maybe I don't need either a normal (because it is the nromal at my UV)
-        //public Vector3d Normal;
-        // Maybe I don't need a Frame either, also because it is from UV
-        //public Plane Frame;
-
         public Polyline PlatePolyline;
         // Curve Cannot be set to "null". are there properties of Curve I need taht Polyline does not have?
         //public Curve PlateCurve;
@@ -31,13 +26,13 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// <summary>
         /// The list of 2-dimensional moves
         /// </summary>
-        public List<Vector2d> Moves = new List<Vector2d>();
+        public List<double> Moves = new List<double>();
         public List<double> Weights = new List<double>();
 
 
-        public RailsAgent(double startPosition, List<BehaviorBase> behaviors) : base(startPosition, behaviors)
+        public RailsAgent(double parameter, List<BehaviorBase> behaviors)
         {
-            this.StartLocation = this.LocationParameter = startPosition;
+            this.startT = this.T = parameter;
             this.Behaviors = behaviors;
         }
 
@@ -46,7 +41,7 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// </summary>
         public override void Reset()
         {
-            this.LocationParameter = this.StartLocation;
+            this.T = this.startT;
             Moves.Clear();
             Weights.Clear();
             PlatePolyline.Clear();
@@ -62,13 +57,6 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
 
             RailsAgentSystem thisAgentSystem = this.AgentSystem as RailsAgentSystem;
 
-            // get Normal
-            Vector3d normalFromEnvironment = thisAgentSystem.SingleBrepEnvironment.GetNormal(Position);
-            if (normalFromEnvironment != Vector3d.Unset) Normal = normalFromEnvironment;
-
-            //get Frame
-
-            this.Frame = new Plane(this.Position, this.Normal);
         }
 
         /// <summary>
@@ -85,9 +73,9 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// </summary>
         public override void PostExecute()
         {
-            if (Moves.Count == 0) return;
+            if (this.Moves.Count == 0) return;
 
-            Vector3d totalWeightedMove = Vector3d.Zero;
+            double totalWeightedMove = 0.0;
             double totalWeight = 0.0;
 
             for (int i = 0; i < Moves.Count; ++i)
@@ -97,7 +85,29 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
             }
 
             if (totalWeight > 0.0)
-                Position += totalWeightedMove / totalWeight;
+                this.T += totalWeightedMove / totalWeight;
+
+            // point on curve
+            // surface cp
+            // get UV
+            // draw flow curve
+
+            // ## After update position ## //
+            // Find flow line
+            //Limit the accuracy to the document tolerance.
+            double accuracy = 1.0;
+            //accuracy = System.Convert.ToDouble(Math.Max(accuracy, doc.ModelAbsoluteTolerance));
+
+            //Declare our list of samples.
+            List<Point3d> dir0 = SampleCurvature(this.AgentSystem.SingleBrepEnvironment.BrepObject, uv, accuracy, max, 0, 3);
+            List<Point3d> dir1 = SampleCurvature(srf, uv, accuracy, max, Math.PI, 3);
+
+            //Remove the first point in dir1 as it's a duplicate
+            dir1.RemoveAt(0);
+            dir1.Reverse();
+
+            dir1.AddRange(dir0);
+            pts = dir1;
         }
 
         /// <summary>
@@ -114,5 +124,240 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         /// The ID of the agent, unique within the given system
         /// </summary>
         public new int Id { get; internal set; }
+        
+        /// <summary>
+        /// creates a list of points from which to make a flow line
+        /// </summary>
+        /// <param name="srf"></param>
+        /// <param name="uv"></param>
+        /// <param name="accuracy"></param>
+        /// <param name="max"></param>
+        /// <param name="angle"></param>
+        /// <param name="alg"></param>
+        /// <returns>
+        /// returns a list of p3d
+        /// </returns>
+        private List<Point3d> SampleCurvature(Surface srf, Point3d uv, double accuracy, bool max, double angle, int alg)
+        {
+            Point3d p = uv;
+            Interval U = srf.Domain(0);
+            Interval V = srf.Domain(1);
+
+            List<Point3d> samples = new List<Point3d>();
+            do
+            {
+                //Add the current point.
+                samples.Add(srf.PointAt(p.X, p.Y));
+
+                //####################################
+                //##### Euler/Modified Euler/RK4 #####
+                //####################################
+                Vector3d dir = new Vector3d();
+
+                switch (alg)
+                {
+                    case 1:
+                        dir = Euler(srf, p, max, angle, accuracy, samples);
+                        break;
+                    case 2:
+                        dir = ModEuler(srf, p, max, angle, accuracy, samples);
+                        break;
+                    case 3:
+                        dir = RK4(srf, p, max, angle, accuracy, samples);
+                        break;
+
+                }
+
+                if (ReferenceEquals(dir, null))
+                {
+                    break;
+                }
+
+                double s = 0;
+                double t = 0;
+                Point3d pt = samples[samples.Count - 1] + dir;
+                if (!srf.ClosestPoint(pt, out s, out t))
+                {
+                    break;
+                }
+
+                //##################
+                //##### Checks #####
+                //##################
+                //Abort if we've added more than 10,000 samples.
+                if (samples.Count > 9999)
+                {
+                    break;
+                }
+
+                //Abort if we've wandered beyond the surface edge.
+                if (!U.IncludesParameter(s, true))
+                {
+                    break;
+                }
+                if (!V.IncludesParameter(t, true))
+                {
+                    break;
+                }
+
+                //Abort if the new point is basically the same as the old point.
+                if ((Math.Abs(p.X - s) < 1e-12) && (Math.Abs(p.Y - t) < 1e-12))
+                {
+                    break;
+                }
+
+                p.X = s;
+                p.Y = t;
+            } while (true);
+
+            return samples;
+        }
+
+        /// <summary>
+        /// FLow line method
+        /// </summary>
+        /// <param name="srf"></param>
+        /// <param name="p"></param>
+        /// <param name="max"></param>
+        /// <param name="angle"></param>
+        /// <param name="h"></param>
+        /// <param name="samples"></param>
+        /// <returns>
+        /// Returns a Vector3d
+        /// </returns>
+        private Vector3d RK4(Surface srf, Point3d p, bool max, double angle, double h, List<Point3d> samples)
+        {
+            int N = samples.Count;
+            Vector3d PrevDir = new Vector3d();
+            if (N > 1)
+            {
+                PrevDir = samples[N - 1] - samples[N - 2];
+            }
+
+            Vector3d K1 = GetDir(srf, p, max, angle, h, PrevDir);
+            if (ReferenceEquals(K1, null))
+            {
+                return default(Vector3d);
+            }
+
+            //Move the last point in the list along the curvature direction.
+            Point3d pt1 = samples[samples.Count - 1] + K1 * 0.5;
+
+            double s = 0;
+            double t = 0;
+            if (!srf.ClosestPoint(pt1, out s, out t))
+            {
+                return default(Vector3d);
+            }
+            pt1.X = s;
+            pt1.Y = t;
+
+            Vector3d K2 = GetDir(srf, pt1, max, angle, h, K1);
+            if (ReferenceEquals(K2, null))
+            {
+                return default(Vector3d);
+            }
+
+            Point3d pt2 = samples[samples.Count - 1] + K2 * 0.5;
+
+            if (!srf.ClosestPoint(pt2, out s, out t))
+            {
+                return default(Vector3d);
+            }
+            pt2.X = s;
+            pt2.Y = t;
+
+            Vector3d K3 = GetDir(srf, pt2, max, angle, h, K1);
+            if (ReferenceEquals(K3, null))
+            {
+                return default(Vector3d);
+            }
+
+            Point3d pt3 = samples[samples.Count - 1] + K3;
+
+            if (!srf.ClosestPoint(pt3, out s, out t))
+            {
+                return default(Vector3d);
+            }
+            pt3.X = s;
+            pt3.Y = t;
+
+            Vector3d K4 = GetDir(srf, pt3, max, angle, h, K1);
+            if (ReferenceEquals(K4, null))
+            {
+                return default(Vector3d);
+            }
+
+            Vector3d dir = (double)1 / 6 * (K1 + 2 * K2 + 2 * K3 + K4);
+            return dir;
+        }
+
+        /// <summary>
+        /// choose correct direction for flow
+        /// </summary>
+        /// <param name="srf"></param>
+        /// <param name="p"></param>
+        /// <param name="max"></param>
+        /// <param name="angle"></param>
+        /// <param name="h"></param>
+        /// <param name="PrevDir"></param>
+        /// <returns>
+        /// returns a Vector3d
+        /// </returns>
+        private Vector3d GetDir(Surface srf, Point3d p, bool max, double angle, double h, Vector3d PrevDir)
+        {
+            //Get the curvature at the current point.
+            SurfaceCurvature crv = srf.CurvatureAt(p.X, p.Y);
+
+            //Get the maximum principal direction.
+            Vector3d dir = new Vector3d();
+            if (crv.Kappa(0) > crv.Kappa(1))
+            {
+                if (max)
+                {
+                    dir = crv.Direction(0);
+                }
+                else
+                {
+                    dir = crv.Direction(1);
+                }
+            }
+            else
+            {
+                if (max)
+                {
+                    dir = crv.Direction(1);
+                }
+                else
+                {
+                    dir = crv.Direction(0);
+                }
+            }
+
+            dir.Rotate(angle, crv.Normal);
+
+            if (!dir.IsValid)
+            {
+                return default(Vector3d);
+            }
+            if (!dir.Unitize())
+            {
+                return default(Vector3d);
+            }
+
+            //Scale the direction vector to match our accuracy.
+            dir *= h;
+
+            //Flip the direction 180 degrees if it seems to be going backwards
+            if (!ReferenceEquals(PrevDir, null))
+            {
+                if (dir.IsParallelTo(PrevDir, 0.5 * Math.PI) < 0)
+                {
+                    dir.Reverse();
+                }
+            }
+
+            return dir;
+        }
     }
 }

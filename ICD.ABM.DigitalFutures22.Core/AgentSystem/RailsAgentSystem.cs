@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 using Rhino.Geometry;
 
-using ICD.AbmFramework.Core.Agent;
-using ICD.AbmFramework.Core.AgentSystem;
+using ABxM.Core.Agent;
+using ABxM.Core.AgentSystem;
+using ABxM.Core.Environments;
 
 using ICD.ABM.DigitalFutures22.Core.Agent;
 
@@ -15,7 +16,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
 {
     public class RailsAgentSystem: AgentSystemBase
     {
-        public Surface SystemSurface = null;
+        public SingleBrepEnvironment SingleBrepEnvironment = null;
 
         public RailsAgentSystem(List<UmbilicalAgent> agents)
         {
