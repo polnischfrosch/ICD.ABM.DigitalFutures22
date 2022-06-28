@@ -29,11 +29,11 @@ namespace ICD.ABM.DigitalFutures22.Core.Agent
         public List<double> Weights = new List<double>();
 
 
-        public RailsAgent(double parameter, Curve systemCurve, List<BehaviorBase> behaviors)
+        public RailsAgent(double parameter, List<BehaviorBase> behaviors)
         {
             this.startT = this.T = parameter;
             this.Behaviors = behaviors;
-            this.SystemCurve = systemCurve;
+            //this.SystemCurve = systemCurve;
         }
 
         /// <summary>
