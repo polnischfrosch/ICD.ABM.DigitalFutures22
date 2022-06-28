@@ -9,6 +9,8 @@ using Rhino.Geometry;
 using ABxM.Core.Agent;
 using ABxM.Core.AgentSystem;
 using ABxM.Core.Environments;
+using ABxM.Core.Behavior;
+using ABxM.Core.Utilities;
 
 using ICD.ABM.DigitalFutures22.Core.Agent;
 
@@ -19,7 +21,7 @@ namespace ICD.ABM.DigitalFutures22.Core.AgentSystem
         public SingleBrepEnvironment SingleBrepEnvironment = null;
         public Surface SystemSurface = null;
 
-        public RailsAgentSystem(List<UmbilicalAgent> agents)
+        public RailsAgentSystem(List<RailsAgent> agents)
         {
             Agents = new List<AgentBase>();
             for (int i = 0; i < agents.Count; ++i)

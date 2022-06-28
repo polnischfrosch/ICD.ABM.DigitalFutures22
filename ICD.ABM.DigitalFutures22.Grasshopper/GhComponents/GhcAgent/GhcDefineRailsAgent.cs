@@ -106,6 +106,6 @@ namespace ICD.ABM.DigitalFutures22.Grasshopper.GhComponents.GhcAgent
 
         protected override System.Drawing.Bitmap Icon => null;
         public override GH_Exposure Exposure => GH_Exposure.primary;
-        public override Guid ComponentGuid => new Guid("2120E0A5-5082-4255-A6B5-834E9B8E5C97");
+        public override Guid ComponentGuid => new Guid("2120E0A5-5082-4255-A6B5-834E9B8E5A97");
     }
 }
